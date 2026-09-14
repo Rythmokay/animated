@@ -1,8 +1,8 @@
-# Step 5 of 5: Understanding `app/page.tsx`
+# Step 5 of 5: Understanding `app/page.tsx` & ASMR Sound Engine
 
 > **Reading Order**: **[Step 4: `layout.tsx`](file:///Users/rythmjagga/Downloads/rythmvideozip/docs/04_layout_tsx.md)** ➔ Step 5 (Final Step)
 
-> **Analogy**: Imagine a physical **flipbook** with 240 drawn pages. As you turn the pages quickly with your thumb, the drawing animates into a smooth moving picture. `app/page.tsx` turns your browser into a high-speed digital flipbook where your **scroll wheel acts as your thumb**, flipping through 240 image frames rendered onto an HTML5 Canvas.
+> **Analogy**: Imagine a physical **vintage film projector or mechanical flipbook**. As you turn the pages with your thumb, the drawing animates on screen, accompanied by a soft, tactile mechanical clicking sound. `app/page.tsx` turns your browser into a high-speed digital flipbook where your **scroll wheel acts as your thumb**, flipping through 240 image frames rendered onto an HTML5 Canvas while playing real-time synthesized **ASMR micro-tick sound effects**!
 
 ---
 
@@ -11,29 +11,74 @@
 ### 1. What is an HTML5 `<canvas>`?
 An HTML5 Canvas is an empty high-speed pixel grid. Instead of loading slow static image tags (`<img />`), JavaScript paints image frames onto the canvas 60 times per second using `ctx.drawImage()`.
 
-### 2. Client Components (`'use client'`)
-Browsers handle user interactions like scrolling, canvas drawing, and window resizing. Adding `'use client'` at line 1 tells Next.js to run this code inside the user's browser.
+### 2. What is the Web Audio API & ASMR Sound Synthesis?
+Instead of downloading audio files (which add network delays), we use the **Web Audio API** (`AudioContext`). It synthesizes custom sound waves directly inside your device's sound processor in real time.
+- **ASMR Sound Effect**: We create short, warm, 8-millisecond micro-bursts filtered through a bandpass frequency filter (around 1500Hz) to mimic the satisfying tactile tick of a mechanical reel or film projector sprocket.
 
-### 3. React `useState` vs `useRef`
-- **`useState`**: Used for data that updates the UI when changed (e.g. updating the "Loading assets 50%" counter text).
-- **`useRef`**: Used for fast-changing values (60 times per second, like scroll position or canvas reference) **without causing slow React re-renders**.
+### 3. Browser User-Gesture Audio Policy
+Web browsers (like Chrome and Safari) block websites from playing audio automatically until the user interacts with the page (scrolling, clicking, or pressing a key). We handle this by initializing `AudioContext` on the user's first scroll gesture.
 
-### 4. Linear Interpolation (Lerp)
+### 4. React `useState` vs `useRef`
+- **`useState`**: Used for data that updates the visual UI (e.g. updating the sound toggle button text `🎧 ASMR Sound ON` / `🔇 ASMR Sound OFF`).
+- **`useRef`**: Used for fast-changing values (60 times per second, like canvas context, current frame index, and the audio engine instance) **without causing slow React re-renders**.
+
+### 5. Linear Interpolation (Lerp)
 If scrolling fast jumps instantly from frame 10 to frame 50, the animation stutters. **Lerping** smoothly bridges the distance step-by-step:
 `currentFrame += (targetFrame - currentFrame) * 0.35`
-This creates silky-smooth cinematic motion.
 
-### 5. `requestAnimationFrame` (rAF)
+### 6. `requestAnimationFrame` (rAF)
 Synchronizes canvas redrawing with your monitor's exact refresh rate (e.g. 60Hz or 120Hz) for stutter-free performance.
-
-### 6. Object-Cover Math
-Calculates image scaling so the frame always covers 100% of the screen width and height regardless of whether the user is on a phone or ultrawide monitor.
 
 ---
 
-## 🔍 Section-by-Section Code Breakdown
+## 🔍 Code Section Breakdown
 
-### Section 1: Preloading All 240 Frames
+### Section 1: Web Audio ASMR Sound Engine Class
+
+```typescript
+class ASMRSoundEngine {
+  private ctx: AudioContext | null = null;
+  private noiseBuffer: AudioBuffer | null = null;
+  public isMuted: boolean = false;
+
+  init() {
+    const AudioCtx = window.AudioContext;
+    this.ctx = new AudioCtx();
+    this.createNoiseBuffer();
+  }
+```
+- **`init()`**: Initializes the Web Audio processor when the user first scrolls or clicks on the page.
+
+```typescript
+  playTick(velocity = 1) {
+    if (this.isMuted) return;
+    const t = this.ctx.currentTime;
+
+    // 1. Create short 20ms noise buffer
+    const source = this.ctx.createBufferSource();
+    source.buffer = this.noiseBuffer;
+
+    // 2. Bandpass filter for film reel tactile tone
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1500 + Math.random() * 200, t);
+
+    // 3. Exponential volume envelope (micro-tick decay)
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.02, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.006);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    source.start(t);
+  }
+```
+- **`playTick(velocity)`**: Synthesizes a soft 8-millisecond mechanical micro-tick whenever the frame changes during scrolling. The volume and frequency dynamically respond to scroll velocity.
+
+---
+
+### Section 2: Preloading All 240 Frames
 
 ```tsx
 5: const TOTAL_FRAMES = 240;
@@ -44,19 +89,9 @@ Calculates image scaling so the frame always covers 100% of the screen width and
 ```
 - Maps frame index `0` ➔ `/frames/frame_001.jpg` up to index `239` ➔ `/frames/frame_240.jpg`.
 
-```tsx
-24: useEffect(() => {
-28:   for (let i = 0; i < TOTAL_FRAMES; i++) {
-29:     const img = new Image();
-30:     img.src = getFramePath(i);
-31:     img.onload = () => setLoadedCount(c => c + 1);
-...
-```
-- Downloads all 240 images into browser memory immediately so scrolling is instant and fast.
-
 ---
 
-### Section 2: Drawing Frames with DPR & Object-Cover
+### Section 3: Drawing Frames with Object-Cover Scaling
 
 ```tsx
 61: const drawFrame = (frameIndex: number) => {
@@ -67,74 +102,37 @@ Calculates image scaling so the frame always covers 100% of the screen width and
 ```
 - **DPR (Device Pixel Ratio)**: Multiplies resolution on Retina high-DPI displays so the picture is razor-sharp.
 
+---
+
+### Section 4: Triggering ASMR Ticks on Frame Changes
+
 ```tsx
-111:   if (canvasAspect > imgAspect) {
-112:     drawWidth = canvasWidth;
-113:     drawHeight = canvasWidth / imgAspect;
-...
+177: if (frameToDraw !== lastDrawnFrame) {
+178:   drawFrame(frameToDraw);
+179:   if (lastDrawnFrame !== -1 && soundEngineRef.current) {
+180:     const frameDelta = Math.abs(frameToDraw - lastDrawnFrame);
+181:     soundEngineRef.current.playTick(frameDelta);
+182:   }
+183:   lastDrawnFrame = frameToDraw;
+184: }
 ```
-- Calculates centered `object-cover` scaling so images fill the screen without stretching or distortion.
+- Whenever the scroll moves far enough to advance the frame, `playTick(frameDelta)` plays a subtle ASMR click sound!
 
 ---
 
-### Section 3: Scroll Position Calculation
+### Section 5: UI Markup & ASMR Sound Toggle Button
 
 ```tsx
-129: const handleScroll = () => {
-130:   const scrollTop = window.scrollY || document.documentElement.scrollTop;
-131:   const docHeight = document.documentElement.scrollHeight;
-132:   const maxScroll = docHeight - window.innerHeight;
-135:   const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
-136:   targetFrameRef.current = scrollFraction * (TOTAL_FRAMES - 1);
-137: };
+222: <button onClick={toggleSound}>
+223:   <span>{isAudioMuted ? '🔇' : '🎧'}</span>
+224:   <span>{isAudioMuted ? 'ASMR Sound OFF' : 'ASMR Sound ON'}</span>
+225: </button>
 ```
-- **Scroll Math**: Converts scroll pixel position into a fraction from `0.0` (top) to `1.0` (bottom) and multiplies by `239` to get the target frame number!
-
----
-
-### Section 4: The 60FPS Lerp Render Loop
-
-```tsx
-160: const animate = () => {
-161:   const target = targetFrameRef.current;
-162:   const current = currentFrameRef.current;
-163:   const diff = target - current;
-165:   currentFrameRef.current += diff * 0.35;
-177:   if (frameToDraw !== lastDrawnFrame) {
-178:     drawFrame(frameToDraw);
-179:   }
-183:   requestRef.current = requestAnimationFrame(animate);
-184: };
-```
-- Smoothly advances `currentFrameRef` toward `targetFrameRef` and draws the frame onto the canvas on every screen refresh.
-
----
-
-### Section 5: Full Screen Fixed Canvas Markup
-
-```tsx
-197: return (
-198:   <main style={{ minHeight: '600vh', height: '600vh', position: 'relative', width: '100%' }}>
-199:     <canvas
-200:       ref={canvasRef}
-201:       style={{
-202:         position: 'fixed',
-203:         top: 0,
-204:         left: 0,
-205:         width: '100vw',
-206:         height: '100vh',
-207:         objectFit: 'cover',
-208:         pointerEvents: 'none',
-209:         zIndex: 1,
-210:       }}
-211:     />
-```
-- `<main style={{ minHeight: '600vh' }}>`: Gives the page 600% height of scroll space.
-- `<canvas style={{ position: 'fixed', width: '100vw', height: '100vh' }}>`: Locks the canvas full screen while you scroll.
+- A sleek floating pill button in the top right corner allowing users to easily mute or unmute the ASMR sound effects anytime.
 
 ---
 
 ## 🎯 Congratulations!
-You have completed all 5 steps of the documentation suite!
+You have completed the full documentation suite!
 - **[Return to Step 1: `package.json`](file:///Users/rythmjagga/Downloads/rythmvideozip/docs/01_package_json.md)**
 - **[Return to Documentation Index](file:///Users/rythmjagga/Downloads/rythmvideozip/docs/README.md)**
