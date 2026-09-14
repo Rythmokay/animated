@@ -1,8 +1,8 @@
-# Step 5 of 5: Understanding `app/page.tsx`, Opening Quote Screen & Downloaded MP3 Audio
+# Step 5 of 5: Understanding `app/page.tsx`, Opening Quote Screen & Scroll-Synced Audio
 
 > **Reading Order**: **[Step 4: `layout.tsx`](file:///Users/rythmjagga/Downloads/rythmvideozip/docs/04_layout_tsx.md)** ➔ Step 5 (Final Step)
 
-> **Analogy**: Imagine a **cinematic documentary film**. It begins with a pure white screen and a powerful quote on hard work and overcoming failure. When you click *"Begin Experience"* or start scrolling, your downloaded audio track (`public/sound.mp3`) begins playing seamlessly as the quote fades away, transitioning into the full-screen 240-frame scroll animation!
+> **Analogy**: Imagine a **cinematic documentary film**. It begins with a pure white screen and a powerful quote on hard work and overcoming failure. When you click *"Begin Experience"* or start scrolling, the opening quote screen fades away. As you scroll down through the 240 frame animation, your downloaded sound effect file (`public/sound.mp3`) is triggered in **tactile micro-bursts synced directly to your scroll wheel**, giving a satisfying mechanical feedback feel!
 
 ---
 
@@ -16,55 +16,41 @@
   > *“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”*  
   > — Nelson Mandela
 
-### 2. Downloaded Audio Track (`public/sound.mp3`)
-- The downloaded MP3 sound file is stored in `public/sound.mp3` and loaded using the HTML5 `Audio` API.
-- Plays smoothly when clicking *"Begin Experience"* or scrolling through the frame sequence.
-- Includes a floating glassmorphism audio toggle button (`🎵 Audio ON` / `🔇 Audio OFF`) in the top-right corner.
+### 2. Scroll-Synced Audio Triggering (No Endless Background Loop)
+- **`sound.mp3` Audio Pool**: Pre-loads a pool of audio instances using `new Audio('/sound.mp3')`.
+- **Zero Loop**: Background looping is turned OFF (`audio.loop = false`).
+- **Tactile Scroll Clicks**: Plays a short click sample from `sound.mp3` whenever the scroll position advances to a new frame.
+- **50ms Throttling**: Limits click playback to 50ms intervals so fast scrolling sounds crisp, clean, and rhythmic rather than noisy or chaotic.
 
 ---
 
 ## 🔍 Code Section Breakdown
 
-### Section 1: Audio Element Initialization
+### Section 1: Audio Pool Initialization & Throttled Scroll Click
 
 ```typescript
 useEffect(() => {
-  const audio = new Audio('/sound.mp3');
-  audio.loop = true;
-  audio.volume = 0.5;
-  audioRef.current = audio;
-
-  return () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-  };
+  const pool: HTMLAudioElement[] = [];
+  for (let i = 0; i < 6; i++) {
+    const audio = new Audio('/sound.mp3');
+    audio.loop = false; // Do NOT play on continuous loop
+    pool.push(audio);
+  }
+  audioPoolRef.current = pool;
 }, []);
+
+const playScrollClick = () => {
+  if (isMuted) return;
+  const now = performance.now();
+  if (now - lastClickTimeRef.current < 50) return; // 50ms throttling
+  lastClickTimeRef.current = now;
+
+  const availableAudio = pool.find(a => a.paused || a.ended) || pool[0];
+  availableAudio.currentTime = 0;
+  availableAudio.play();
+};
 ```
-- **`new Audio('/sound.mp3')`**: Loads the MP3 file from the `public/` directory and sets loop mode to `true`.
-
----
-
-### Section 2: Opening White Screen Quote Overlay Markup
-
-```tsx
-<div style={{
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100vw',
-  height: '100vh',
-  backgroundColor: '#ffffff',
-  color: '#000000',
-  zIndex: 99999,
-}}>
-  <blockquote style={{ fontSize: 'clamp(24px, 4vw, 42px)', color: '#000000' }}>
-    “Do not judge me by my successes, judge me by how many times I fell down and got back up again.”
-  </blockquote>
-  <button onClick={handleStartExperience}>Begin Experience</button>
-</div>
-```
-- Fades out smoothly when the user clicks *"Begin Experience"*, unlocking scrolling and starting audio playback!
+- **`playScrollClick()`**: Plays a tactile click from `sound.mp3` when scrolling, throttled to 50ms for a clean mechanical reel feel.
 
 ---
 

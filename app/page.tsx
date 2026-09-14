@@ -12,7 +12,8 @@ const getFramePath = (index: number) => {
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioPoolRef = useRef<HTMLAudioElement[]>([]);
+  const lastClickTimeRef = useRef<number>(0);
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -25,18 +26,22 @@ export default function Home() {
   const targetFrameRef = useRef(0);
   const requestRef = useRef<number | null>(null);
 
-  // Initialize HTML5 Audio with downloaded sound.mp3
+  // Pre-create a pool of audio elements for instant zero-latency scroll clicks from sound.mp3
   useEffect(() => {
-    const audio = new Audio('/sound.mp3');
-    audio.loop = true;
-    audio.volume = 0.5;
-    audioRef.current = audio;
+    const pool: HTMLAudioElement[] = [];
+    for (let i = 0; i < 6; i++) {
+      const audio = new Audio('/sound.mp3');
+      audio.loop = false; // Do NOT play on continuous loop
+      audio.volume = 0.3;
+      pool.push(audio);
+    }
+    audioPoolRef.current = pool;
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      audioPoolRef.current.forEach(a => {
+        a.pause();
+      });
+      audioPoolRef.current = [];
     };
   }, []);
 
@@ -66,29 +71,39 @@ export default function Home() {
     };
   }, []);
 
-  const playDownloadedAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {
-        // Handle browser autoplay policy restrictions gracefully
-      });
-    }
-  };
-
   const handleStartExperience = () => {
     setShowQuote(false);
     document.body.style.overflow = 'auto';
-    playDownloadedAudio();
   };
 
   const toggleAudio = () => {
-    if (!audioRef.current) return;
-    if (isMuted) {
-      audioRef.current.muted = false;
-      setIsMuted(false);
-      audioRef.current.play().catch(() => {});
-    } else {
-      audioRef.current.muted = true;
-      setIsMuted(true);
+    setIsMuted(prev => !prev);
+  };
+
+  // Play a crisp, throttled tactile scroll click from the sound.mp3 audio pool
+  const playScrollClick = () => {
+    if (isMuted) return;
+
+    const now = performance.now();
+    // Throttle clicks to 50ms intervals so scrolling sounds rhythmic & pleasant, not overcrowded
+    if (now - lastClickTimeRef.current < 50) return;
+    lastClickTimeRef.current = now;
+
+    // Find an available audio instance from pool
+    const pool = audioPoolRef.current;
+    if (pool.length === 0) return;
+
+    const availableAudio = pool.find(a => a.paused || a.ended) || pool[0];
+    if (availableAudio) {
+      try {
+        availableAudio.currentTime = 0;
+        availableAudio.volume = 0.28;
+        availableAudio.play().catch(() => {
+          // Handle browser audio play restrictions gracefully
+        });
+      } catch {
+        // Ignore audio play errors
+      }
     }
   };
 
@@ -191,7 +206,7 @@ export default function Home() {
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
-  // Scroll listener to compute target frame & modulate audio sync
+  // Scroll listener to compute target frame
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
@@ -206,11 +221,6 @@ export default function Home() {
 
       const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
       targetFrameRef.current = scrollFraction * (TOTAL_FRAMES - 1);
-
-      // Auto play audio on first scroll if not playing
-      if (audioRef.current && audioRef.current.paused && !isMuted) {
-        audioRef.current.play().catch(() => {});
-      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -221,7 +231,7 @@ export default function Home() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [isMuted]);
+  }, []);
 
   // Resize handler
   useEffect(() => {
@@ -233,7 +243,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Animation loop with lerping
+  // Animation loop with lerping & scroll-synced sound click triggering
   useEffect(() => {
     let lastDrawnFrame = -1;
 
@@ -255,6 +265,12 @@ export default function Home() {
 
       if (frameToDraw !== lastDrawnFrame) {
         drawFrame(frameToDraw);
+
+        // Trigger tactile scroll click sound from sound.mp3 whenever frame changes during scrolling
+        if (lastDrawnFrame !== -1 && !showQuote) {
+          playScrollClick();
+        }
+
         lastDrawnFrame = frameToDraw;
       }
 
@@ -268,7 +284,7 @@ export default function Home() {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, []);
+  }, [showQuote, isMuted]);
 
   const progressPercent = Math.round((loadedCount / TOTAL_FRAMES) * 100);
 
@@ -357,7 +373,7 @@ export default function Home() {
               — Nelson Mandela
             </div>
 
-            {/* Interactive Start Button with Synchronized Audio */}
+            {/* Interactive Start Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -412,10 +428,10 @@ export default function Home() {
             boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
             transition: 'all 0.2s ease',
           }}
-          aria-label="Toggle Audio"
+          aria-label="Toggle Scroll Sound"
         >
-          <span>{isMuted ? '🔇' : '🎵'}</span>
-          <span>{isMuted ? 'Audio OFF' : 'Audio ON'}</span>
+          <span>{isMuted ? '🔇' : '🎧'}</span>
+          <span>{isMuted ? 'Scroll Sound OFF' : 'Scroll Sound ON'}</span>
         </button>
       )}
 
