@@ -9,11 +9,12 @@ const getFramePath = (index: number) => {
   return `/frames/frame_${frameNum}.jpg`;
 };
 
-// Web Audio ASMR Click Synthesizer for tactile scroll sound
+export type SoundMode = 'haptic' | 'wood' | 'tick' | 'muted';
+
+// Crystal-Clear Web Audio ASMR Sound Engine (Pure Sine/Triangle Oscillators - Zero Static Noise)
 class ASMRSoundEngine {
   private ctx: AudioContext | null = null;
-  private noiseBuffer: AudioBuffer | null = null;
-  public isMuted: boolean = false;
+  public mode: SoundMode = 'haptic';
 
   init() {
     if (this.ctx) return;
@@ -21,26 +22,13 @@ class ASMRSoundEngine {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       this.ctx = new AudioCtx();
-      this.createNoiseBuffer();
     } catch {
-      // AudioContext not supported or blocked
+      // AudioContext not supported
     }
-  }
-
-  private createNoiseBuffer() {
-    if (!this.ctx) return;
-    const bufferSize = Math.floor(this.ctx.sampleRate * 0.02); // 20ms noise buffer
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const output = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      // Soft organic noise curve
-      output[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
-    }
-    this.noiseBuffer = buffer;
   }
 
   playTick(velocity = 1) {
-    if (this.isMuted) return;
+    if (this.mode === 'muted') return;
     if (!this.ctx) this.init();
     if (!this.ctx) return;
 
@@ -50,35 +38,59 @@ class ASMRSoundEngine {
 
     try {
       const t = this.ctx.currentTime;
-
-      // 1. Noise click source
-      const source = this.ctx.createBufferSource();
-      if (!this.noiseBuffer) this.createNoiseBuffer();
-      if (!this.noiseBuffer) return;
-      source.buffer = this.noiseBuffer;
-
-      // 2. Warm bandpass filter (film reel / mechanical ASMR tone)
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      // Slight pitch variation per tick for organic texture
-      const centerFreq = 1500 + (Math.random() * 200 - 100) + Math.min(600, velocity * 100);
-      filter.frequency.setValueAtTime(centerFreq, t);
-      filter.Q.setValueAtTime(3.0, t);
-
-      // 3. Exponential decay volume envelope
+      const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const baseVol = Math.min(0.06, 0.015 + Math.min(0.035, velocity * 0.008));
-      gain.gain.setValueAtTime(baseVol, t);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.006);
 
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.ctx.destination);
+      if (this.mode === 'haptic') {
+        // Mode 1: Haptic Click (Apple Crown / Mechanical Wheel - Pure Sine Pitch Sweep)
+        osc.type = 'sine';
+        const startFreq = Math.min(900, 650 + velocity * 25);
+        const endFreq = 160;
+        osc.frequency.setValueAtTime(startFreq, t);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, t + 0.007);
 
-      source.start(t);
-      source.stop(t + 0.008);
+        const vol = Math.min(0.04, 0.012 + Math.min(0.02, velocity * 0.004));
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.007);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.008);
+
+      } else if (this.mode === 'wood') {
+        // Mode 2: Soft Wood Pop (Warm Mechanical Camera Shutter / Woodblock)
+        osc.type = 'triangle';
+        const startFreq = Math.min(1400, 1000 + velocity * 30);
+        osc.frequency.setValueAtTime(startFreq, t);
+        osc.frequency.exponentialRampToValueAtTime(220, t + 0.012);
+
+        const vol = Math.min(0.035, 0.01 + Math.min(0.018, velocity * 0.003));
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.012);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.013);
+
+      } else if (this.mode === 'tick') {
+        // Mode 3: Minimal Whisper Tick (Ultra-quiet high frequency tap)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1800, t);
+        osc.frequency.exponentialRampToValueAtTime(500, t + 0.004);
+
+        const vol = Math.min(0.025, 0.008 + Math.min(0.012, velocity * 0.002));
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.004);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.005);
+      }
     } catch {
-      // Ignore transient audio play errors
+      // Ignore audio playback errors
     }
   }
 }
@@ -90,7 +102,7 @@ export default function Home() {
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [soundMode, setSoundMode] = useState<SoundMode>('haptic');
   const [hasInteracted, setHasInteracted] = useState(false);
 
   // Animation state refs for rAF loop
@@ -122,6 +134,17 @@ export default function Home() {
       window.removeEventListener('keydown', handleFirstInteraction);
     };
   }, []);
+
+  // Sync sound mode
+  const changeSoundMode = (newMode: SoundMode) => {
+    setSoundMode(newMode);
+    if (soundEngineRef.current) {
+      soundEngineRef.current.mode = newMode;
+      if (newMode !== 'muted') {
+        soundEngineRef.current.playTick(1.5);
+      }
+    }
+  };
 
   // Preload frames
   useEffect(() => {
@@ -259,7 +282,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Animation loop with lerping & ASMR audio triggering
+  // Animation loop with lerping & sound triggering
   useEffect(() => {
     let lastDrawnFrame = -1;
 
@@ -282,7 +305,6 @@ export default function Home() {
       if (frameToDraw !== lastDrawnFrame) {
         drawFrame(frameToDraw);
 
-        // Trigger ASMR micro-tick sound when frame changes
         if (lastDrawnFrame !== -1 && soundEngineRef.current) {
           const frameDelta = Math.abs(frameToDraw - lastDrawnFrame);
           soundEngineRef.current.playTick(frameDelta);
@@ -302,13 +324,6 @@ export default function Home() {
       }
     };
   }, []);
-
-  const toggleSound = () => {
-    if (soundEngineRef.current) {
-      soundEngineRef.current.isMuted = !soundEngineRef.current.isMuted;
-      setIsAudioMuted(soundEngineRef.current.isMuted);
-    }
-  };
 
   const progressPercent = Math.round((loadedCount / TOTAL_FRAMES) * 100);
 
@@ -338,38 +353,95 @@ export default function Home() {
         }}
       />
 
-      {/* Floating ASMR Audio Control Button */}
-      <button
-        onClick={toggleSound}
+      {/* Premium Floating Sound Control Menu */}
+      <div
         style={{
           position: 'fixed',
           top: '24px',
           right: '24px',
           zIndex: 100,
-          background: 'rgba(15, 15, 15, 0.75)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          background: 'rgba(15, 15, 15, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           border: '1px solid rgba(255, 255, 255, 0.15)',
-          color: isAudioMuted ? '#71717a' : '#f4f4f5',
-          padding: '10px 18px',
           borderRadius: '30px',
-          fontSize: '13px',
-          fontWeight: 500,
-          letterSpacing: '0.04em',
-          cursor: 'pointer',
+          padding: '6px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-          transition: 'all 0.2s ease',
+          gap: '4px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         }}
-        aria-label="Toggle ASMR Scroll Sound"
       >
-        <span style={{ fontSize: '14px' }}>{isAudioMuted ? '🔇' : '🎧'}</span>
-        <span>{isAudioMuted ? 'ASMR Sound OFF' : 'ASMR Sound ON'}</span>
-      </button>
+        <button
+          onClick={() => changeSoundMode('haptic')}
+          style={{
+            background: soundMode === 'haptic' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+            border: 'none',
+            color: soundMode === 'haptic' ? '#ffffff' : '#a1a1aa',
+            padding: '8px 14px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🎧 Haptic
+        </button>
 
-      {/* Subtle interaction tip / audio indicator */}
+        <button
+          onClick={() => changeSoundMode('wood')}
+          style={{
+            background: soundMode === 'wood' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+            border: 'none',
+            color: soundMode === 'wood' ? '#ffffff' : '#a1a1aa',
+            padding: '8px 14px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🪵 Wood Pop
+        </button>
+
+        <button
+          onClick={() => changeSoundMode('tick')}
+          style={{
+            background: soundMode === 'tick' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+            border: 'none',
+            color: soundMode === 'tick' ? '#ffffff' : '#a1a1aa',
+            padding: '8px 14px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          ✨ Soft Tick
+        </button>
+
+        <button
+          onClick={() => changeSoundMode('muted')}
+          style={{
+            background: soundMode === 'muted' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
+            border: 'none',
+            color: soundMode === 'muted' ? '#ef4444' : '#71717a',
+            padding: '8px 14px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🔇 Mute
+        </button>
+      </div>
+
+      {/* Subtle interaction tip */}
       {!hasInteracted && isLoaded && (
         <div
           style={{
@@ -378,18 +450,18 @@ export default function Home() {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 10,
-            background: 'rgba(0, 0, 0, 0.65)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            padding: '8px 20px',
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            padding: '8px 22px',
             borderRadius: '20px',
             fontSize: '12px',
-            color: '#a1a1aa',
+            color: '#d4d4d8',
             pointerEvents: 'none',
             letterSpacing: '0.04em',
           }}
         >
-          Scroll to experience ASMR sound
+          Scroll to trigger interactive sound presets
         </div>
       )}
 
