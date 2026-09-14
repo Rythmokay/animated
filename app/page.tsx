@@ -12,8 +12,8 @@ const getFramePath = (index: number) => {
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  const audioPoolRef = useRef<HTMLAudioElement[]>([]);
-  const lastClickTimeRef = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -26,22 +26,21 @@ export default function Home() {
   const targetFrameRef = useRef(0);
   const requestRef = useRef<number | null>(null);
 
-  // Pre-create a pool of audio elements for instant zero-latency scroll clicks from sound.mp3
+  // Initialize HTML5 Audio for sound.mp3
   useEffect(() => {
-    const pool: HTMLAudioElement[] = [];
-    for (let i = 0; i < 6; i++) {
-      const audio = new Audio('/sound.mp3');
-      audio.loop = false; // Do NOT play on continuous loop
-      audio.volume = 0.3;
-      pool.push(audio);
-    }
-    audioPoolRef.current = pool;
+    const audio = new Audio('/sound.mp3');
+    audio.loop = true;
+    audio.volume = 0.4;
+    audioRef.current = audio;
 
     return () => {
-      audioPoolRef.current.forEach(a => {
-        a.pause();
-      });
-      audioPoolRef.current = [];
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -77,34 +76,13 @@ export default function Home() {
   };
 
   const toggleAudio = () => {
-    setIsMuted(prev => !prev);
-  };
-
-  // Play a crisp, throttled tactile scroll click from the sound.mp3 audio pool
-  const playScrollClick = () => {
-    if (isMuted) return;
-
-    const now = performance.now();
-    // Throttle clicks to 50ms intervals so scrolling sounds rhythmic & pleasant, not overcrowded
-    if (now - lastClickTimeRef.current < 50) return;
-    lastClickTimeRef.current = now;
-
-    // Find an available audio instance from pool
-    const pool = audioPoolRef.current;
-    if (pool.length === 0) return;
-
-    const availableAudio = pool.find(a => a.paused || a.ended) || pool[0];
-    if (availableAudio) {
-      try {
-        availableAudio.currentTime = 0;
-        availableAudio.volume = 0.28;
-        availableAudio.play().catch(() => {
-          // Handle browser audio play restrictions gracefully
-        });
-      } catch {
-        // Ignore audio play errors
+    setIsMuted(prev => {
+      const nextMuted = !prev;
+      if (nextMuted && audioRef.current) {
+        audioRef.current.pause();
       }
-    }
+      return nextMuted;
+    });
   };
 
   // Preload frames
@@ -206,7 +184,7 @@ export default function Home() {
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
-  // Scroll listener to compute target frame
+  // Scroll listener: Computes target frame AND controls audio so it ONLY plays while actively scrolling
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
@@ -221,6 +199,24 @@ export default function Home() {
 
       const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
       targetFrameRef.current = scrollFraction * (TOTAL_FRAMES - 1);
+
+      // Play audio ONLY while actively scrolling
+      if (!showQuote && !isMuted && audioRef.current) {
+        if (audioRef.current.paused) {
+          audioRef.current.play().catch(() => {});
+        }
+
+        // Reset scroll stop timer: if no scroll event for 120ms, pause audio immediately!
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (audioRef.current && !audioRef.current.paused) {
+            audioRef.current.pause();
+          }
+        }, 120);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -230,8 +226,11 @@ export default function Home() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
-  }, []);
+  }, [showQuote, isMuted]);
 
   // Resize handler
   useEffect(() => {
@@ -243,7 +242,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Animation loop with lerping & scroll-synced sound click triggering
+  // Animation loop with lerping
   useEffect(() => {
     let lastDrawnFrame = -1;
 
@@ -265,12 +264,6 @@ export default function Home() {
 
       if (frameToDraw !== lastDrawnFrame) {
         drawFrame(frameToDraw);
-
-        // Trigger tactile scroll click sound from sound.mp3 whenever frame changes during scrolling
-        if (lastDrawnFrame !== -1 && !showQuote) {
-          playScrollClick();
-        }
-
         lastDrawnFrame = frameToDraw;
       }
 
@@ -284,7 +277,7 @@ export default function Home() {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [showQuote, isMuted]);
+  }, []);
 
   const progressPercent = Math.round((loadedCount / TOTAL_FRAMES) * 100);
 

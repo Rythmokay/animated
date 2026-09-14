@@ -1,56 +1,58 @@
-# Step 5 of 5: Understanding `app/page.tsx`, Opening Quote Screen & Scroll-Synced Audio
+# Step 5 of 5: Understanding `app/page.tsx`, Opening Quote Screen & Active-Scroll Audio
 
 > **Reading Order**: **[Step 4: `layout.tsx`](file:///Users/rythmjagga/Downloads/rythmvideozip/docs/04_layout_tsx.md)** ➔ Step 5 (Final Step)
 
-> **Analogy**: Imagine a **cinematic documentary film**. It begins with a pure white screen and a powerful quote on hard work and overcoming failure. When you click *"Begin Experience"* or start scrolling, the opening quote screen fades away. As you scroll down through the 240 frame animation, your downloaded sound effect file (`public/sound.mp3`) is triggered in **tactile micro-bursts synced directly to your scroll wheel**, giving a satisfying mechanical feedback feel!
+> **Analogy**: Imagine a **physical hand-cranked music box**. The music plays **ONLY while your hand is actively turning the crank**. The moment you stop turning the crank, the music stops instantly. `app/page.tsx` works the exact same way—audio plays **only while your fingers are actively scrolling**, and pauses immediately when scrolling stops!
 
 ---
 
 ## 💡 Fundamental Concepts to Know First
 
-### 1. Opening Quote Overlay (White Background & Black Font)
+### 1. Active-Scroll Audio Gating
+- **Playing on Scroll**: Listening to the `scroll` event. As long as scroll events are actively firing, `audio.play()` is triggered.
+- **Scroll Stop Timeout (120ms)**: If no new scroll event is received within 120 milliseconds (meaning the user stopped scrolling), `audio.pause()` is immediately called!
+- **Zero Idle Audio**: When standing still on the page, the site is 100% quiet.
+
+### 2. Opening Quote Overlay (White Background & Black Font)
 - **Background**: `#ffffff` (Pure White).
 - **Text Color**: `#000000` (Deep Black).
-- **Typography**: Uses serif font styling (`Georgia`, `Times New Roman`) with generous line-height and letter-spacing for a high-end philosophical feel.
 - **Quote**:
   > *“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”*  
   > — Nelson Mandela
-
-### 2. Scroll-Synced Audio Triggering (No Endless Background Loop)
-- **`sound.mp3` Audio Pool**: Pre-loads a pool of audio instances using `new Audio('/sound.mp3')`.
-- **Zero Loop**: Background looping is turned OFF (`audio.loop = false`).
-- **Tactile Scroll Clicks**: Plays a short click sample from `sound.mp3` whenever the scroll position advances to a new frame.
-- **50ms Throttling**: Limits click playback to 50ms intervals so fast scrolling sounds crisp, clean, and rhythmic rather than noisy or chaotic.
 
 ---
 
 ## 🔍 Code Section Breakdown
 
-### Section 1: Audio Pool Initialization & Throttled Scroll Click
+### Section 1: Active Scroll Detection & Audio Timeout
 
 ```typescript
 useEffect(() => {
-  const pool: HTMLAudioElement[] = [];
-  for (let i = 0; i < 6; i++) {
-    const audio = new Audio('/sound.mp3');
-    audio.loop = false; // Do NOT play on continuous loop
-    pool.push(audio);
-  }
-  audioPoolRef.current = pool;
-}, []);
+  const handleScroll = () => {
+    if (!showQuote && !isMuted && audioRef.current) {
+      // 1. Play audio while active scrolling is happening
+      if (audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
 
-const playScrollClick = () => {
-  if (isMuted) return;
-  const now = performance.now();
-  if (now - lastClickTimeRef.current < 50) return; // 50ms throttling
-  lastClickTimeRef.current = now;
+      // 2. Reset scroll-stop timer
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
 
-  const availableAudio = pool.find(a => a.paused || a.ended) || pool[0];
-  availableAudio.currentTime = 0;
-  availableAudio.play();
-};
+      // 3. Pause audio immediately if scrolling stops for 120ms
+      scrollTimeoutRef.current = setTimeout(() => {
+        if (audioRef.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+        }
+      }, 120);
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+}, [showQuote, isMuted]);
 ```
-- **`playScrollClick()`**: Plays a tactile click from `sound.mp3` when scrolling, throttled to 50ms for a clean mechanical reel feel.
+- **`scrollTimeoutRef`**: Ensures audio is strictly tied to active scrolling motion.
 
 ---
 
