@@ -18,6 +18,7 @@ export default function Home() {
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showQuote, setShowQuote] = useState(true);
+  const [isExitingQuote, setIsExitingQuote] = useState(false);
   const [quoteStep, setQuoteStep] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -26,11 +27,11 @@ export default function Home() {
   const targetFrameRef = useRef(0);
   const requestRef = useRef<number | null>(null);
 
-  // Initialize HTML5 Audio for sound.mp3
+  // Initialize HTML5 Audio with reduced volume (15% volume)
   useEffect(() => {
     const audio = new Audio('/sound.mp3');
     audio.loop = true;
-    audio.volume = 0.4;
+    audio.volume = 0.15; // Gentle, subtle background volume
     audioRef.current = audio;
 
     return () => {
@@ -57,11 +58,11 @@ export default function Home() {
     };
   }, [showQuote]);
 
-  // Text animation step sequence for quote screen
+  // Smooth staggered text animation step sequence for quote screen
   useEffect(() => {
     const timer1 = setTimeout(() => setQuoteStep(1), 300);
-    const timer2 = setTimeout(() => setQuoteStep(2), 1200);
-    const timer3 = setTimeout(() => setQuoteStep(3), 2400);
+    const timer2 = setTimeout(() => setQuoteStep(2), 1000);
+    const timer3 = setTimeout(() => setQuoteStep(3), 2000);
 
     return () => {
       clearTimeout(timer1);
@@ -71,8 +72,14 @@ export default function Home() {
   }, []);
 
   const handleStartExperience = () => {
-    setShowQuote(false);
-    document.body.style.overflow = 'auto';
+    if (isExitingQuote) return;
+    setIsExitingQuote(true);
+
+    // Smooth transition out
+    setTimeout(() => {
+      setShowQuote(false);
+      document.body.style.overflow = 'auto';
+    }, 1000);
   };
 
   const toggleAudio = () => {
@@ -184,7 +191,7 @@ export default function Home() {
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
-  // Scroll listener: Computes target frame AND controls audio so it ONLY plays while actively scrolling
+  // Scroll listener: Computes target frame AND controls audio so it ONLY plays while actively scrolling (volume = 0.15)
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
@@ -200,13 +207,14 @@ export default function Home() {
       const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
       targetFrameRef.current = scrollFraction * (TOTAL_FRAMES - 1);
 
-      // Play audio ONLY while actively scrolling
+      // Play reduced volume audio ONLY while actively scrolling
       if (!showQuote && !isMuted && audioRef.current) {
+        audioRef.current.volume = 0.15; // 15% volume
         if (audioRef.current.paused) {
           audioRef.current.play().catch(() => {});
         }
 
-        // Reset scroll stop timer: if no scroll event for 120ms, pause audio immediately!
+        // Reset scroll stop timer: if no scroll event for 130ms, pause audio!
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current);
         }
@@ -215,7 +223,7 @@ export default function Home() {
           if (audioRef.current && !audioRef.current.paused) {
             audioRef.current.pause();
           }
-        }, 120);
+        }, 130);
       }
     };
 
@@ -312,6 +320,9 @@ export default function Home() {
             textAlign: 'center',
             cursor: 'pointer',
             userSelect: 'none',
+            opacity: isExitingQuote ? 0 : 1,
+            transform: isExitingQuote ? 'scale(1.02)' : 'scale(1)',
+            transition: 'opacity 1.0s cubic-bezier(0.16, 1, 0.3, 1), transform 1.0s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           <div style={{ maxWidth: '850px', width: '100%' }}>
@@ -326,7 +337,7 @@ export default function Home() {
                 color: '#555555',
                 opacity: quoteStep >= 1 ? 1 : 0,
                 transform: quoteStep >= 1 ? 'translateY(0)' : 'translateY(16px)',
-                transition: 'all 0.8s ease',
+                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
               A Reflection On Persistence
@@ -344,7 +355,7 @@ export default function Home() {
                 margin: '0 0 32px 0',
                 opacity: quoteStep >= 2 ? 1 : 0,
                 transform: quoteStep >= 2 ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 1.0s ease',
+                transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
               “Do not judge me by my successes, judge me by how many times I fell down and got back up again.”
@@ -360,7 +371,7 @@ export default function Home() {
                 color: '#666666',
                 marginBottom: '48px',
                 opacity: quoteStep >= 2 ? 1 : 0,
-                transition: 'all 1.0s ease 0.2s',
+                transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.15s',
               }}
             >
               — Nelson Mandela
@@ -383,7 +394,7 @@ export default function Home() {
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
                 opacity: quoteStep >= 3 ? 1 : 0,
                 transform: quoteStep >= 3 ? 'scale(1)' : 'scale(0.95)',
                 transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
