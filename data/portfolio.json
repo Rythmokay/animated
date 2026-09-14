@@ -1,76 +1,58 @@
 {
   "about": {
     "name": "Rythm Jagga",
-    "title": "Creative Technologist & Software Architect",
-    "tagline": "Architecting high-performance digital experiences through engineering precision and luxury design.",
+    "title": "Creative Technologist & Visual Architect",
+    "tagline": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "quote": "“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”",
     "quoteAuthor": "Nelson Mandela",
-    "bio": "I bridge the gap between complex software engineering and high-fashion visual aesthetics. Specializing in full-stack Next.js applications, 60FPS canvas animations, and resilient cloud architecture, I turn bold creative visions into immaculate interactive reality.",
+    "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     "stats": [
-      { "label": "Years Experience", "value": "5+" },
-      { "label": "Projects Completed", "value": "30+" },
-      { "label": "Canvas Animations", "value": "60 FPS" },
-      { "label": "Code Precision", "value": "99.9%" }
+      { "label": "Projects Completed", "value": "25+" },
+      { "label": "Years Experience", "value": "4+" },
+      { "label": "Client Satisfaction", "value": "100%" },
+      { "label": "Frame Rate", "value": "60 FPS" }
     ]
   },
   "skills": [
-    { "id": "s1", "name": "Next.js 15 & React 19", "category": "Frontend", "level": 95 },
-    { "id": "s2", "name": "TypeScript & Architecture", "category": "Engineering", "level": 92 },
-    { "id": "s3", "name": "HTML5 Canvas & Web Audio API", "category": "Creative Tech", "level": 90 },
-    { "id": "s4", "name": "Node.js & REST APIs", "category": "Backend", "level": 88 },
-    { "id": "s5", "name": "Luxury UI/UX & Motion Design", "category": "Design", "level": 94 },
-    { "id": "s6", "name": "Tailwind CSS & Vanilla CSS3", "category": "Frontend", "level": 96 }
+    { "id": "s1", "name": "Frontend Architecture", "category": "Core", "level": 95 },
+    { "id": "s2", "name": "Creative Development", "category": "Creative", "level": 90 },
+    { "id": "s3", "name": "UI/UX Motion Design", "category": "Design", "level": 92 },
+    { "id": "s4", "name": "Backend Services", "category": "Systems", "level": 85 }
   ],
   "experiences": [
     {
       "id": "e1",
-      "role": "Lead Creative Engineer",
-      "company": "Rythm Studios",
+      "role": "Senior Creative Developer",
+      "company": "Digital Studio Co.",
       "period": "2024 — Present",
-      "description": "Architected full-screen 60FPS frame animation suites, custom Web Audio synthesis engines, and high-conversion luxury web applications for premium global clients."
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet."
     },
     {
       "id": "e2",
-      "role": "Senior Full-Stack Engineer",
-      "company": "Apex Digital",
+      "role": "Frontend Software Engineer",
+      "company": "Creative Media Lab",
       "period": "2022 — 2024",
-      "description": "Scaled Next.js web platforms to millions of monthly active users. Reduced bundle sizes by 40% and optimized canvas rendering loops for high-DPI displays."
-    },
-    {
-      "id": "e3",
-      "role": "Frontend Specialist",
-      "company": "Vanguard Interactive",
-      "period": "2021 — 2022",
-      "description": "Engineered responsive component libraries, interactive data visualizations, and micro-animation design systems."
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa."
     }
   ],
   "projects": [
     {
       "id": "p1",
-      "title": "Cinematic Canvas Scroll Suite",
-      "category": "Creative Tech",
-      "description": "A 240-frame high-performance HTML5 Canvas animation system with object-cover scaling, DPR optimization, and Web Audio API scroll synchronization.",
-      "tags": ["Next.js", "Canvas 2D", "Web Audio", "TypeScript"],
-      "link": "https://github.com",
+      "title": "Frame Canvas Scroll Animation",
+      "category": "Interactive Web",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus.",
+      "tags": ["Next.js", "Canvas 2D", "Web Audio"],
+      "link": "#",
       "featured": true
     },
     {
       "id": "p2",
-      "title": "Luxury Brand Digital Showcase",
-      "category": "Web Application",
-      "description": "A high-fashion luxury digital experience with glassmorphic cards, gold calligraphic typography, and real-time backend content management.",
-      "tags": ["React 19", "Node.js", "Glassmorphism", "CSS3"],
-      "link": "https://github.com",
+      "title": "Luxury Brand Digital Platform",
+      "category": "Web Design",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquet quam id dui posuium blandit. Cras ultricies ligula sed magna dictum porta.",
+      "tags": ["React 19", "CSS3", "Typography"],
+      "link": "#",
       "featured": true
-    },
-    {
-      "id": "p3",
-      "title": "Real-time Admin Analytics Hub",
-      "category": "Dashboard",
-      "description": "An interactive management portal featuring real-time data persistence, skill proficiencies manager, and live portfolio editing.",
-      "tags": ["Next.js API", "TypeScript", "REST API", "JSON Store"],
-      "link": "https://github.com",
-      "featured": false
     }
   ]
 }
