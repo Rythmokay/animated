@@ -9,140 +9,156 @@ const getFramePath = (index: number) => {
   return `/frames/frame_${frameNum}.jpg`;
 };
 
-export type SoundMode = 'haptic' | 'wood' | 'tick' | 'muted';
-
-// Crystal-Clear Web Audio ASMR Sound Engine (Pure Sine/Triangle Oscillators - Zero Static Noise)
-class ASMRSoundEngine {
+// Synchronized Web Audio Engine for Opening Intro & Scroll Resonance
+class CinematicAudioEngine {
   private ctx: AudioContext | null = null;
-  public mode: SoundMode = 'haptic';
+  private masterGain: GainNode | null = null;
+  private oscs: OscillatorNode[] = [];
+  private filter: BiquadFilterNode | null = null;
+  private isInitialized = false;
 
   init() {
-    if (this.ctx) return;
+    if (this.isInitialized) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       this.ctx = new AudioCtx();
+
+      // Master gain node
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      this.masterGain.connect(this.ctx.destination);
+
+      // Low pass filter for warm cinematic tone
+      this.filter = this.ctx.createBiquadFilter();
+      this.filter.type = 'lowpass';
+      this.filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+      this.filter.connect(this.masterGain);
+
+      this.isInitialized = true;
     } catch {
-      // AudioContext not supported
+      // AudioContext blocked or unsupported
     }
   }
 
-  playTick(velocity = 1) {
-    if (this.mode === 'muted') return;
-    if (!this.ctx) this.init();
-    if (!this.ctx) return;
+  // Play opening synchronized chord pulse
+  playIntroChord() {
+    this.init();
+    if (!this.ctx || !this.filter || !this.masterGain) return;
 
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
 
-    try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+    const t = this.ctx.currentTime;
+    
+    // Stop any previous oscillators
+    this.oscs.forEach(osc => {
+      try { osc.stop(); } catch {}
+    });
+    this.oscs = [];
 
-      if (this.mode === 'haptic') {
-        // Mode 1: Haptic Click (Apple Crown / Mechanical Wheel - Pure Sine Pitch Sweep)
-        osc.type = 'sine';
-        const startFreq = Math.min(900, 650 + velocity * 25);
-        const endFreq = 160;
-        osc.frequency.setValueAtTime(startFreq, t);
-        osc.frequency.exponentialRampToValueAtTime(endFreq, t + 0.007);
+    // F-minor / C-deep atmospheric ambient triad (C2, F2, Ab2, C3)
+    const freqs = [65.41, 87.31, 103.83, 130.81];
 
-        const vol = Math.min(0.04, 0.012 + Math.min(0.02, velocity * 0.004));
-        gain.gain.setValueAtTime(vol, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.007);
+    freqs.forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const oscGain = this.ctx!.createGain();
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.008);
+      osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
 
-      } else if (this.mode === 'wood') {
-        // Mode 2: Soft Wood Pop (Warm Mechanical Camera Shutter / Woodblock)
-        osc.type = 'triangle';
-        const startFreq = Math.min(1400, 1000 + velocity * 30);
-        osc.frequency.setValueAtTime(startFreq, t);
-        osc.frequency.exponentialRampToValueAtTime(220, t + 0.012);
+      // Slight detune for rich analog chorus warmth
+      const detune = (i - 1.5) * 4;
+      osc.detune.setValueAtTime(detune, t);
 
-        const vol = Math.min(0.035, 0.01 + Math.min(0.018, velocity * 0.003));
-        gain.gain.setValueAtTime(vol, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.012);
+      oscGain.gain.setValueAtTime(0.12 / freqs.length, t);
+      osc.connect(oscGain);
+      oscGain.connect(this.filter!);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.013);
+      osc.start(t);
+      this.oscs.push(osc);
+    });
 
-      } else if (this.mode === 'tick') {
-        // Mode 3: Minimal Whisper Tick (Ultra-quiet high frequency tap)
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1800, t);
-        osc.frequency.exponentialRampToValueAtTime(500, t + 0.004);
+    // Fade in master gain smoothly
+    this.masterGain.gain.cancelScheduledValues(t);
+    this.masterGain.gain.setValueAtTime(0.001, t);
+    this.masterGain.gain.exponentialRampToValueAtTime(0.18, t + 1.2);
 
-        const vol = Math.min(0.025, 0.008 + Math.min(0.012, velocity * 0.002));
-        gain.gain.setValueAtTime(vol, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.004);
+    // Filter frequency sweep
+    this.filter.frequency.cancelScheduledValues(t);
+    this.filter.frequency.setValueAtTime(300, t);
+    this.filter.frequency.exponentialRampToValueAtTime(850, t + 2.5);
+  }
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.005);
-      }
-    } catch {
-      // Ignore audio playback errors
-    }
+  // Modulate sound smoothly during scroll
+  updateScrollAudio(scrollRatio: number) {
+    if (!this.ctx || !this.filter || !this.masterGain || this.oscs.length === 0) return;
+
+    const t = this.ctx.currentTime;
+    
+    // Dynamically adjust cutoff frequency based on scroll position
+    const targetFreq = Math.min(2200, 400 + scrollRatio * 1600);
+    this.filter.frequency.setTargetAtTime(targetFreq, t, 0.1);
+
+    // Subtly modulate pitch to match frame progression speed
+    this.oscs.forEach((osc, i) => {
+      const baseFreq = [65.41, 87.31, 103.83, 130.81][i] || 100;
+      const pitchMod = baseFreq * (1 + scrollRatio * 0.15);
+      osc.frequency.setTargetAtTime(pitchMod, t, 0.1);
+    });
+  }
+
+  stop() {
+    if (!this.ctx || !this.masterGain) return;
+    const t = this.ctx.currentTime;
+    this.masterGain.gain.setTargetAtTime(0.0001, t, 0.3);
+    setTimeout(() => {
+      this.oscs.forEach(osc => {
+        try { osc.stop(); } catch {}
+      });
+      this.oscs = [];
+    }, 500);
   }
 }
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  const soundEngineRef = useRef<ASMRSoundEngine | null>(null);
+  const audioEngineRef = useRef<CinematicAudioEngine | null>(null);
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [soundMode, setSoundMode] = useState<SoundMode>('haptic');
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [showQuote, setShowQuote] = useState(true);
+  const [quoteStep, setQuoteStep] = useState(0);
 
   // Animation state refs for rAF loop
   const currentFrameRef = useRef(0);
   const targetFrameRef = useRef(0);
   const requestRef = useRef<number | null>(null);
 
-  // Initialize ASMR Audio Engine
+  // Initialize Cinematic Audio Engine
   useEffect(() => {
-    soundEngineRef.current = new ASMRSoundEngine();
+    audioEngineRef.current = new CinematicAudioEngine();
+  }, []);
 
-    const handleFirstInteraction = () => {
-      if (soundEngineRef.current) {
-        soundEngineRef.current.init();
-      }
-      setHasInteracted(true);
-      window.removeEventListener('scroll', handleFirstInteraction);
-      window.removeEventListener('click', handleFirstInteraction);
-      window.removeEventListener('keydown', handleFirstInteraction);
-    };
-
-    window.addEventListener('scroll', handleFirstInteraction, { passive: true });
-    window.addEventListener('click', handleFirstInteraction, { passive: true });
-    window.addEventListener('keydown', handleFirstInteraction, { passive: true });
+  // Text animation step sequence for quote screen
+  useEffect(() => {
+    const timer1 = setTimeout(() => setQuoteStep(1), 400);
+    const timer2 = setTimeout(() => setQuoteStep(2), 1800);
+    const timer3 = setTimeout(() => setQuoteStep(3), 3200);
 
     return () => {
-      window.removeEventListener('scroll', handleFirstInteraction);
-      window.removeEventListener('click', handleFirstInteraction);
-      window.removeEventListener('keydown', handleFirstInteraction);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
     };
   }, []);
 
-  // Sync sound mode
-  const changeSoundMode = (newMode: SoundMode) => {
-    setSoundMode(newMode);
-    if (soundEngineRef.current) {
-      soundEngineRef.current.mode = newMode;
-      if (newMode !== 'muted') {
-        soundEngineRef.current.playTick(1.5);
-      }
+  const handleStartExperience = () => {
+    setShowQuote(false);
+    if (audioEngineRef.current) {
+      audioEngineRef.current.playIntroChord();
     }
   };
 
@@ -245,7 +261,7 @@ export default function Home() {
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
-  // Scroll listener to compute target frame
+  // Scroll listener to compute target frame & sync audio modulation
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
@@ -260,6 +276,19 @@ export default function Home() {
 
       const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
       targetFrameRef.current = scrollFraction * (TOTAL_FRAMES - 1);
+
+      // Auto dismiss quote on initial scroll
+      if (scrollTop > 50 && showQuote) {
+        setShowQuote(false);
+        if (audioEngineRef.current) {
+          audioEngineRef.current.playIntroChord();
+        }
+      }
+
+      // Modulate audio with scroll
+      if (audioEngineRef.current) {
+        audioEngineRef.current.updateScrollAudio(scrollFraction);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -270,7 +299,7 @@ export default function Home() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [showQuote]);
 
   // Resize handler
   useEffect(() => {
@@ -282,7 +311,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Animation loop with lerping & sound triggering
+  // Animation loop with lerping
   useEffect(() => {
     let lastDrawnFrame = -1;
 
@@ -304,12 +333,6 @@ export default function Home() {
 
       if (frameToDraw !== lastDrawnFrame) {
         drawFrame(frameToDraw);
-
-        if (lastDrawnFrame !== -1 && soundEngineRef.current) {
-          const frameDelta = Math.abs(frameToDraw - lastDrawnFrame);
-          soundEngineRef.current.playTick(frameDelta);
-        }
-
         lastDrawnFrame = frameToDraw;
       }
 
@@ -337,6 +360,105 @@ export default function Home() {
         background: '#050505',
       }}
     >
+      {/* Full Screen White Intro Overlay with Black Font */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: '#ffffff',
+          color: '#000000',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px 24px',
+          textAlign: 'center',
+          opacity: showQuote ? 1 : 0,
+          pointerEvents: showQuote ? 'auto' : 'none',
+          transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        <div style={{ maxWidth: '850px', width: '100%' }}>
+          {/* Subtitle Tagline */}
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+              marginBottom: '32px',
+              color: '#444444',
+              opacity: quoteStep >= 1 ? 1 : 0,
+              transform: quoteStep >= 1 ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.8s ease',
+            }}
+          >
+            A Reflection On Persistence
+          </div>
+
+          {/* Main Philosophical Quote on Failure & Hard Work */}
+          <blockquote
+            style={{
+              fontSize: 'clamp(24px, 4vw, 42px)',
+              fontWeight: 400,
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              lineHeight: 1.4,
+              letterSpacing: '-0.01em',
+              color: '#000000',
+              margin: '0 0 32px 0',
+              opacity: quoteStep >= 2 ? 1 : 0,
+              transform: quoteStep >= 2 ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'all 1.0s ease',
+            }}
+          >
+            “Do not judge me by my successes, judge me by how many times I fell down and got back up again.”
+          </blockquote>
+
+          {/* Quote Author */}
+          <div
+            style={{
+              fontSize: '15px',
+              fontWeight: 500,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: '#666666',
+              marginBottom: '48px',
+              opacity: quoteStep >= 2 ? 1 : 0,
+              transition: 'all 1.0s ease 0.2s',
+            }}
+          >
+            — Nelson Mandela
+          </div>
+
+          {/* Interactive Start Button with Synchronized Audio */}
+          <button
+            onClick={handleStartExperience}
+            style={{
+              background: '#000000',
+              color: '#ffffff',
+              border: 'none',
+              padding: '16px 36px',
+              borderRadius: '40px',
+              fontSize: '14px',
+              fontWeight: 600,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+              opacity: quoteStep >= 3 ? 1 : 0,
+              transform: quoteStep >= 3 ? 'scale(1)' : 'scale(0.95)',
+              transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            Begin Experience
+          </button>
+        </div>
+      </div>
+
       {/* Full screen canvas fixed to viewport */}
       <canvas
         ref={canvasRef}
@@ -352,118 +474,6 @@ export default function Home() {
           zIndex: 1,
         }}
       />
-
-      {/* Premium Floating Sound Control Menu */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '24px',
-          right: '24px',
-          zIndex: 100,
-          background: 'rgba(15, 15, 15, 0.85)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: '30px',
-          padding: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        <button
-          onClick={() => changeSoundMode('haptic')}
-          style={{
-            background: soundMode === 'haptic' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
-            border: 'none',
-            color: soundMode === 'haptic' ? '#ffffff' : '#a1a1aa',
-            padding: '8px 14px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          🎧 Haptic
-        </button>
-
-        <button
-          onClick={() => changeSoundMode('wood')}
-          style={{
-            background: soundMode === 'wood' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
-            border: 'none',
-            color: soundMode === 'wood' ? '#ffffff' : '#a1a1aa',
-            padding: '8px 14px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          🪵 Wood Pop
-        </button>
-
-        <button
-          onClick={() => changeSoundMode('tick')}
-          style={{
-            background: soundMode === 'tick' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
-            border: 'none',
-            color: soundMode === 'tick' ? '#ffffff' : '#a1a1aa',
-            padding: '8px 14px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          ✨ Soft Tick
-        </button>
-
-        <button
-          onClick={() => changeSoundMode('muted')}
-          style={{
-            background: soundMode === 'muted' ? 'rgba(255, 255, 255, 0.18)' : 'transparent',
-            border: 'none',
-            color: soundMode === 'muted' ? '#ef4444' : '#71717a',
-            padding: '8px 14px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          🔇 Mute
-        </button>
-      </div>
-
-      {/* Subtle interaction tip */}
-      {!hasInteracted && isLoaded && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '30px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 10,
-            background: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            padding: '8px 22px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            color: '#d4d4d8',
-            pointerEvents: 'none',
-            letterSpacing: '0.04em',
-          }}
-        >
-          Scroll to trigger interactive sound presets
-        </div>
-      )}
 
       {/* Non-intrusive preloader indicator */}
       {!isLoaded && (
