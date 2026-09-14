@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Navbar from '@/src/components/Navbar';
+import AboutSection from '@/src/components/AboutSection';
+import ExperienceSection from '@/src/components/ExperienceSection';
+import SkillsSection from '@/src/components/SkillsSection';
+import ProjectsSection from '@/src/components/ProjectsSection';
 
 const TOTAL_FRAMES = 240;
 
@@ -15,6 +20,7 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [portfolioData, setPortfolioData] = useState<any>(null);
   const [loadedCount, setLoadedCount] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showQuote, setShowQuote] = useState(true);
@@ -27,7 +33,19 @@ export default function Home() {
   const targetFrameRef = useRef(0);
   const requestRef = useRef<number | null>(null);
 
-  // Initialize HTML5 Audio with reduced volume (15% volume)
+  // Fetch live portfolio data from Next.js backend API
+  useEffect(() => {
+    fetch('/api/portfolio')
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          setPortfolioData(data);
+        }
+      })
+      .catch(err => console.error('Error fetching portfolio data:', err));
+  }, []);
+
+  // Initialize HTML5 Audio with gentle volume (15% volume)
   useEffect(() => {
     const audio = new Audio('/sound.mp3');
     audio.loop = true;
@@ -75,7 +93,6 @@ export default function Home() {
     if (isExitingQuote) return;
     setIsExitingQuote(true);
 
-    // Smooth transition out
     setTimeout(() => {
       setShowQuote(false);
       document.body.style.overflow = 'auto';
@@ -214,7 +231,6 @@ export default function Home() {
           audioRef.current.play().catch(() => {});
         }
 
-        // Reset scroll stop timer: if no scroll event for 130ms, pause audio!
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current);
         }
@@ -290,16 +306,11 @@ export default function Home() {
   const progressPercent = Math.round((loadedCount / TOTAL_FRAMES) * 100);
 
   return (
-    <main
-      style={{
-        minHeight: '600vh',
-        height: '600vh',
-        position: 'relative',
-        width: '100%',
-        background: '#050505',
-      }}
-    >
-      {/* Full Screen White Intro Overlay with Black Font */}
+    <main className="relative width-full bg-[#050505] text-white overflow-x-hidden">
+      {/* Floating Navbar */}
+      {!showQuote && <Navbar isMuted={isMuted} toggleAudio={toggleAudio} />}
+
+      {/* Full Screen White Intro Overlay with Calligraphic Font Quote */}
       {showQuote && (
         <div
           onClick={handleStartExperience}
@@ -348,7 +359,7 @@ export default function Home() {
               style={{
                 fontSize: 'clamp(24px, 4vw, 42px)',
                 fontWeight: 400,
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontFamily: "var(--font-cormorant), Georgia, 'Times New Roman', serif",
                 lineHeight: 1.4,
                 letterSpacing: '-0.01em',
                 color: '#000000',
@@ -358,7 +369,7 @@ export default function Home() {
                 transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
-              “Do not judge me by my successes, judge me by how many times I fell down and got back up again.”
+              {portfolioData?.about?.quote || "“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”"}
             </blockquote>
 
             {/* Quote Author */}
@@ -374,7 +385,7 @@ export default function Home() {
                 transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.15s',
               }}
             >
-              — Nelson Mandela
+              — {portfolioData?.about?.quoteAuthor || "Nelson Mandela"}
             </div>
 
             {/* Interactive Start Button */}
@@ -406,40 +417,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Floating Audio Control Button */}
-      {!showQuote && (
-        <button
-          onClick={toggleAudio}
-          style={{
-            position: 'fixed',
-            top: '24px',
-            right: '24px',
-            zIndex: 100,
-            background: 'rgba(15, 15, 15, 0.85)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: isMuted ? '#71717a' : '#f4f4f5',
-            padding: '10px 20px',
-            borderRadius: '30px',
-            fontSize: '13px',
-            fontWeight: 500,
-            letterSpacing: '0.04em',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-            transition: 'all 0.2s ease',
-          }}
-          aria-label="Toggle Scroll Sound"
-        >
-          <span>{isMuted ? '🔇' : '🎧'}</span>
-          <span>{isMuted ? 'Scroll Sound OFF' : 'Scroll Sound ON'}</span>
-        </button>
-      )}
-
-      {/* Full screen canvas fixed to viewport */}
+      {/* Full screen canvas fixed to viewport background */}
       <canvas
         ref={canvasRef}
         style={{
@@ -452,8 +430,57 @@ export default function Home() {
           objectFit: 'cover',
           pointerEvents: 'none',
           zIndex: 1,
+          opacity: showQuote ? 0 : 0.85,
+          transition: 'opacity 1.5s ease',
         }}
       />
+
+      {/* Hero Section Banner */}
+      {!showQuote && (
+        <section className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12 text-center">
+          <div className="max-w-4xl mx-auto">
+            <span className="font-cinzel text-xs font-semibold uppercase tracking-[0.4em] text-amber-300 mb-6 block">
+              {portfolioData?.about?.title || 'Creative Technologist'}
+            </span>
+            <h1 className="font-calligraphy text-5xl sm:text-7xl md:text-8xl font-normal tracking-tight text-white mb-8">
+              {portfolioData?.about?.name || 'Rythm Jagga'}
+            </h1>
+            <p className="font-calligraphy text-2xl sm:text-3xl text-neutral-300 italic max-w-2xl mx-auto mb-12">
+              {portfolioData?.about?.tagline || 'Architecting high-performance digital experiences through engineering precision.'}
+            </p>
+            <div className="flex justify-center gap-4">
+              <a
+                href="#about"
+                className="px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-neutral-950 hover:from-amber-100 hover:to-amber-300 transition-all shadow-xl shadow-amber-500/20"
+              >
+                Explore Portfolio ↓
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Layered Portfolio Sections */}
+      {!showQuote && portfolioData && (
+        <>
+          <AboutSection data={portfolioData.about} />
+          <ExperienceSection experiences={portfolioData.experiences} />
+          <SkillsSection skills={portfolioData.skills} />
+          <ProjectsSection projects={portfolioData.projects} />
+
+          {/* Footer */}
+          <footer className="relative z-10 py-16 px-6 border-t border-neutral-800/80 text-center">
+            <div className="max-w-5xl mx-auto">
+              <div className="font-calligraphy text-3xl font-normal text-neutral-200 mb-4">
+                Rythm Jagga
+              </div>
+              <p className="text-xs text-neutral-500 uppercase tracking-widest mb-6">
+                © {new Date().getFullYear()} — Built with Next.js 15, Canvas 2D & Luxury Aesthetics
+              </p>
+            </div>
+          </footer>
+        </>
+      )}
 
       {/* Non-intrusive preloader indicator */}
       {!isLoaded && (
