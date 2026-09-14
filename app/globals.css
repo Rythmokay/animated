@@ -10,7 +10,9 @@
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;
   --font-cinzel: 'Cinzel', serif;
   --font-inter: 'Inter', -apple-system, sans-serif;
-  --color-gold: #dfc285;
+  --font-outfit: 'Outfit', sans-serif;
+  --color-accent: #ffffff;
+  --color-silver: #e2e8f0;
   --color-bg-dark: #050505;
 }
 
@@ -36,47 +38,90 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Calligraphic & Luxury Typography Utilities */
+/* Calligraphic & Luxury Serif Typography Utilities */
 .font-calligraphy {
   font-family: var(--font-cormorant), Georgia, serif;
 }
 
 .font-cinzel {
   font-family: var(--font-cinzel), serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-.text-gold {
-  color: var(--color-gold);
+.font-outfit {
+  font-family: var(--font-outfit), -apple-system, sans-serif;
 }
 
-.gradient-text-gold {
-  background: linear-gradient(135deg, #ffffff 0%, #dfc285 60%, #b89753 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.text-silver {
+  color: #e2e8f0;
 }
 
-/* Glassmorphism Luxury Card Styles */
+/* Smooth Text Reveal Cursor Dot */
+.pen-nib-cursor {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff;
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: nib-pulse 1s infinite alternate;
+}
+
+@keyframes nib-pulse {
+  from {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 1;
+    box-shadow: 0 0 14px #ffffff;
+  }
+}
+
+/* Refined Dark Obsidian Glassmorphism Cards */
 .glass-card {
-  background: rgba(12, 12, 15, 0.75) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: rgba(10, 10, 12, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9) !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .glass-card:hover {
-  border-color: rgba(223, 194, 133, 0.4) !important;
-  box-shadow: 0 25px 60px rgba(223, 194, 133, 0.15) !important;
-  transform: translateY(-3px) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95), 0 0 20px rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-4px) !important;
 }
 
+/* Lighter, Elegant Frosted Glass Navbar Pill */
 .glass-pill {
-  background: rgba(15, 15, 18, 0.8) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  background: rgba(12, 12, 16, 0.88) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
+  transition: all 0.3s ease !important;
+}
+
+.glass-pill:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(18, 18, 22, 0.92) !important;
+}
+
+/* Solid Dark Font Color Utilities (Zero Text Shadows) */
+.text-dark-solid {
+  color: #050505 !important;
+  text-shadow: none !important;
+}
+
+.text-white-crisp {
+  color: #ffffff !important;
+  text-shadow: none !important;
 }
 
 /* Force override any scroll-lock class injected by extensions or IDE wrappers */
@@ -96,10 +141,10 @@ body[class*="scroll-lock"] {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #252528;
+  background: #27272a;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gold);
+  background: #ffffff;
 }

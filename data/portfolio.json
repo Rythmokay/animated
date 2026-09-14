@@ -1,58 +1,85 @@
 {
   "about": {
     "name": "Rythm Jagga",
-    "title": "Creative Technologist & Visual Architect",
-    "tagline": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "quote": "“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”",
-    "quoteAuthor": "Nelson Mandela",
-    "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "title": "Full Stack & Mobile Software Engineer",
+    "phone": "9654627724",
+    "email": "rythm.meta@gmail.com",
+    "linkedin": "https://linkedin.com/in/rythmjagga/",
+    "github": "https://github.com/Rythmokay/",
+    "website": "https://workrythm.vercel.app",
+    "tagline": "Full Stack Software Engineer experienced in engineering production mobile apps (Android with Kotlin, iOS with Swift/UIKit) and full-stack web systems (MERN Stack, Next.js, Spring Boot).",
+    "quote": "Welcome to my portfolio",
+    "quoteSubtext": "Architecting high-performance Android, iOS & full-stack web platforms with engineering precision.",
+    "quoteAuthor": "Rythm Jagga",
+    "bio": "Full Stack Software Engineer experienced in engineering production mobile apps (Android with Kotlin, iOS with Swift/UIKit) and full-stack web systems (MERN Stack, Next.js, Spring Boot). Proven track record of architecting scalable applications, publishing Google Play Store apps, and delivering high-performance end-to-end user experiences.",
+    "education": {
+      "institution": "Guru Gobind Singh Indraprastha University",
+      "degree": "B.Tech in Artificial Intelligence and Data Science",
+      "period": "2022 – 2026",
+      "cgpa": "7.1"
+    },
     "stats": [
-      { "label": "Projects Completed", "value": "25+" },
-      { "label": "Years Experience", "value": "4+" },
-      { "label": "Client Satisfaction", "value": "100%" },
-      { "label": "Frame Rate", "value": "60 FPS" }
+      { "label": "Play Store Apps", "value": "Published" },
+      { "label": "Tech Stack", "value": "Mobile & Web" },
+      { "label": "B.Tech AI & DS", "value": "CGPA 7.1" },
+      { "label": "Freelance Sites", "value": "3+ Delivered" }
     ]
   },
   "skills": [
-    { "id": "s1", "name": "Frontend Architecture", "category": "Core", "level": 95 },
-    { "id": "s2", "name": "Creative Development", "category": "Creative", "level": 90 },
-    { "id": "s3", "name": "UI/UX Motion Design", "category": "Design", "level": 92 },
-    { "id": "s4", "name": "Backend Services", "category": "Systems", "level": 85 }
+    { "id": "s1", "name": "Android Engineering (Kotlin, Jetpack Compose, MVVM)", "category": "Mobile", "level": 95 },
+    { "id": "s2", "name": "iOS Development (Swift, UIKit, SwiftUI)", "category": "Mobile", "level": 90 },
+    { "id": "s3", "name": "Full Stack & Web (Next.js, React, Node.js, Spring Boot)", "category": "Web & Backend", "level": 92 },
+    { "id": "s4", "name": "Databases & Cloud (PostgreSQL, MongoDB, Firebase, Prisma)", "category": "Data & Infra", "level": 88 },
+    { "id": "s5", "name": "AI Microservices (Python, LangChain, LangGraph, RAG, Chroma)", "category": "Gen AI", "level": 85 }
   ],
   "experiences": [
     {
       "id": "e1",
-      "role": "Senior Creative Developer",
-      "company": "Digital Studio Co.",
-      "period": "2024 — Present",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet."
+      "role": "Software Development Engineer",
+      "company": "Concept Kart Private Limited",
+      "period": "May 2026 – Aug 2026",
+      "location": "Delhi, India",
+      "description": "Architected and published native Android app MyAudiocular (Kotlin, MVVM) on Play Store and developed web platform myaudiocular.com (Next.js). Completed 3-month probation period with strong technical delivery and transitioned into a full-time SDE role. Integrated REST APIs for inventory sync, media playback, and checkout flows."
     },
     {
       "id": "e2",
-      "role": "Frontend Software Engineer",
-      "company": "Creative Media Lab",
-      "period": "2022 — 2024",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa."
+      "role": "Full Stack Developer (Android & Web)",
+      "company": "Picturetime Digiplex Pvt. Ltd.",
+      "period": "Feb 2026 – May 2026",
+      "location": "Delhi, India",
+      "description": "Engineered cinema ticket booking workflows featuring interactive seat selection and row-based mapping for mobile and web platforms. Developed Next.js administrative portal with event management tools, category filtering, and automated Excel export."
+    },
+    {
+      "id": "e3",
+      "role": "Generative AI Intern",
+      "company": "Knowledge Excel Private Limited",
+      "period": "Aug 2025 – Oct 2025",
+      "location": "Delhi, India",
+      "description": "Built Python backend microservices for LLM-driven conversational workflows using LangChain and LangGraph. Developed RAG pipelines leveraging Chroma vector database and embedding search with Pydantic validation."
     }
   ],
   "projects": [
     {
       "id": "p1",
-      "title": "Frame Canvas Scroll Animation",
-      "category": "Interactive Web",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus.",
-      "tags": ["Next.js", "Canvas 2D", "Web Audio"],
-      "link": "#",
+      "title": "MyRa (My Revision Approach)",
+      "category": "Full-Stack Web App",
+      "description": "Full-stack DSA revision web application allowing developers to store multi-approach solutions, track coding sheets (Striver/Love Babbar), and export structured PDF summaries. Integrated Judge0 CE API for live in-browser multi-language code execution.",
+      "tags": ["Next.js", "Prisma ORM", "PostgreSQL", "NextAuth", "Judge0 API"],
+      "link": "https://workrythm.vercel.app",
       "featured": true
     },
     {
       "id": "p2",
-      "title": "Luxury Brand Digital Platform",
-      "category": "Web Design",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquet quam id dui posuium blandit. Cras ultricies ligula sed magna dictum porta.",
-      "tags": ["React 19", "CSS3", "Typography"],
-      "link": "#",
+      "title": "MyAudiocular Platform (Android & Web)",
+      "category": "Mobile App & E-Commerce",
+      "description": "Production-grade Kotlin Android app available on Play Store alongside a full-stack Next.js web application for audiophile products with responsive shopping UI and real-time inventory synchronization.",
+      "tags": ["Kotlin", "Android Studio", "Play Store", "Next.js", "REST APIs"],
+      "link": "https://myaudiocular.com",
       "featured": true
     }
+  ],
+  "achievements": [
+    "Hackunicorn Hackathon 2023 (3rd Place) — Built AI-powered catering web application.",
+    "Delivered 3+ Freelance Client Platforms including Moksh Foundation NGO site & startup dashboards."
   ]
 }

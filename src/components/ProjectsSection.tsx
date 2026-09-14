@@ -27,9 +27,9 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
     >
       <div
         style={{
-          maxWidth: '560px',
+          maxWidth: '460px',
           width: '100%',
-          marginLeft: 'clamp(24px, 6vw, 100px)',
+          marginLeft: 'clamp(16px, 4vw, 60px)',
           textAlign: 'left',
         }}
       >
@@ -38,33 +38,33 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
           <span
             style={{
               fontFamily: 'var(--font-cinzel), serif',
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '13px',
+              fontWeight: 700,
+              letterSpacing: '0.25em',
               textTransform: 'uppercase',
-              letterSpacing: '0.35em',
-              color: '#dfc285',
-              marginBottom: '12px',
+              color: '#000000',
+              marginBottom: '8px',
               display: 'block',
             }}
           >
-            Selected Works
+            SELECTED WORKS
           </span>
           <h2
             style={{
               fontFamily: 'var(--font-cormorant), Georgia, serif',
-              fontSize: 'clamp(36px, 5vw, 52px)',
-              fontWeight: 400,
-              color: '#ffffff',
+              fontSize: 'clamp(32px, 4.5vw, 46px)',
+              fontWeight: 700,
+              color: '#000000',
               marginBottom: '20px',
             }}
           >
-            Featured <span style={{ fontStyle: 'italic', color: '#dfc285' }}>Projects</span>
+            Featured <span style={{ fontStyle: 'normal', color: '#000000' }}>Projects</span>
           </h2>
           <div
             style={{
               width: '64px',
-              height: '1px',
-              background: 'linear-gradient(90deg, #dfc285, transparent)',
+              height: '2px',
+              background: '#000000',
             }}
           />
         </div>
@@ -76,7 +76,7 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
               key={proj.id || idx}
               className="glass-card"
               style={{
-                padding: '28px',
+                padding: '26px',
                 borderRadius: '20px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -88,11 +88,11 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
                   <span
                     style={{
                       fontFamily: 'var(--font-cinzel), serif',
-                      fontSize: '10px',
-                      fontWeight: 600,
+                      fontSize: '11px',
+                      fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.15em',
-                      color: '#dfc285',
+                      color: '#ffffff',
                     }}
                   >
                     {proj.category}
@@ -100,15 +100,15 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
                   {proj.featured && (
                     <span
                       style={{
-                        padding: '3px 10px',
+                        padding: '4px 12px',
                         borderRadius: '20px',
                         fontSize: '9px',
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.15em',
-                        background: 'rgba(223, 194, 133, 0.15)',
-                        border: '1px solid rgba(223, 194, 133, 0.4)',
-                        color: '#dfc285',
+                        background: 'rgba(255, 255, 255, 0.14)',
+                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                        color: '#ffffff',
                       }}
                     >
                       ★ Featured
@@ -119,8 +119,8 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
                 <h3
                   style={{
                     fontFamily: 'var(--font-cormorant), Georgia, serif',
-                    fontSize: '26px',
-                    fontWeight: 400,
+                    fontSize: '24px',
+                    fontWeight: 600,
                     color: '#ffffff',
                     marginBottom: '12px',
                   }}
@@ -130,10 +130,11 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
 
                 <p
                   style={{
-                    fontSize: '13px',
-                    color: '#a1a1aa',
+                    fontSize: '13.5px',
+                    color: '#f4f4f5',
                     lineHeight: 1.6,
-                    marginBottom: '20px',
+                    marginBottom: '22px',
+                    fontWeight: 400,
                   }}
                 >
                   {proj.description}
@@ -142,18 +143,18 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
 
               <div>
                 {/* Tech Stack Tags */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '22px' }}>
                   {proj.tags.map((tag, tIdx) => (
                     <span
                       key={tIdx}
                       style={{
-                        padding: '4px 10px',
+                        padding: '5px 12px',
                         borderRadius: '20px',
                         fontSize: '10px',
-                        fontWeight: 500,
-                        background: '#111113',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        color: '#a1a1aa',
+                        fontWeight: 600,
+                        background: 'rgba(24, 24, 28, 0.9)',
+                        border: '1px solid rgba(255, 255, 255, 0.16)',
+                        color: '#e2e8f0',
                       }}
                     >
                       {tag}
@@ -172,10 +173,10 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
                       alignItems: 'center',
                       gap: '6px',
                       fontSize: '11px',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.15em',
-                      color: '#dfc285',
+                      color: '#ffffff',
                       textDecoration: 'none',
                     }}
                   >

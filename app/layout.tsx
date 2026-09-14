@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Cinzel, Inter } from 'next/font/google';
+import { Cormorant_Garamond, Cinzel, Inter, Outfit } from 'next/font/google';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -19,6 +19,12 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-outfit',
+});
+
 export const metadata: Metadata = {
   title: 'Rythm Jagga | Luxury Portfolio & Creative Engineering',
   description: 'Full-screen 240-frame interactive canvas portfolio, experience timeline, skillset dashboard, and luxury showcase.',
@@ -30,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${cinzel.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${cormorant.variable} ${cinzel.variable} ${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>{children}</body>
     </html>
   );

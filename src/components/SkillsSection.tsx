@@ -34,9 +34,9 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
     >
       <div
         style={{
-          maxWidth: '560px',
+          maxWidth: '460px',
           width: '100%',
-          marginLeft: 'clamp(24px, 6vw, 100px)',
+          marginLeft: 'clamp(16px, 4vw, 60px)',
           textAlign: 'left',
         }}
       >
@@ -45,33 +45,33 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
           <span
             style={{
               fontFamily: 'var(--font-cinzel), serif',
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '13px',
+              fontWeight: 700,
+              letterSpacing: '0.25em',
               textTransform: 'uppercase',
-              letterSpacing: '0.35em',
-              color: '#dfc285',
-              marginBottom: '12px',
+              color: '#000000',
+              marginBottom: '8px',
               display: 'block',
             }}
           >
-            Technical Mastery
+            TECHNICAL MASTERY
           </span>
           <h2
             style={{
               fontFamily: 'var(--font-cormorant), Georgia, serif',
-              fontSize: 'clamp(36px, 5vw, 52px)',
-              fontWeight: 400,
-              color: '#ffffff',
+              fontSize: 'clamp(32px, 4.5vw, 46px)',
+              fontWeight: 700,
+              color: '#000000',
               marginBottom: '20px',
             }}
           >
-            Skillset & <span style={{ fontStyle: 'italic', color: '#dfc285' }}>Capabilities</span>
+            Skillset & <span style={{ fontStyle: 'normal', color: '#000000' }}>Capabilities</span>
           </h2>
           <div
             style={{
               width: '64px',
-              height: '1px',
-              background: 'linear-gradient(90deg, #dfc285, transparent)',
+              height: '2px',
+              background: '#000000',
               marginBottom: '24px',
             }}
           />
@@ -83,17 +83,18 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
                 key={idx}
                 onClick={() => setSelectedCategory(cat)}
                 style={{
-                  padding: '6px 16px',
+                  padding: '7px 18px',
                   borderRadius: '30px',
-                  fontSize: '10px',
-                  fontWeight: 500,
+                  fontSize: '11px',
+                  fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
-                  background: selectedCategory === cat ? '#dfc285' : 'rgba(20, 20, 24, 0.8)',
-                  color: selectedCategory === cat ? '#050505' : '#a1a1aa',
-                  border: '1px solid ' + (selectedCategory === cat ? '#dfc285' : 'rgba(255, 255, 255, 0.1)'),
+                  background: selectedCategory === cat ? '#ffffff' : 'rgba(18, 18, 22, 0.9)',
+                  color: selectedCategory === cat ? '#000000' : '#e2e8f0',
+                  border: '1px solid ' + (selectedCategory === cat ? '#ffffff' : 'rgba(255, 255, 255, 0.2)'),
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
+                  boxShadow: selectedCategory === cat ? '0 4px 15px rgba(255, 255, 255, 0.35)' : 'none',
                 }}
               >
                 {cat}
@@ -117,8 +118,8 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
                 <span
                   style={{
                     fontFamily: 'var(--font-cormorant), Georgia, serif',
-                    fontSize: '19px',
-                    fontWeight: 500,
+                    fontSize: '20px',
+                    fontWeight: 600,
                     color: '#ffffff',
                   }}
                 >
@@ -127,9 +128,9 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
                 <span
                   style={{
                     fontFamily: 'var(--font-cinzel), serif',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     fontWeight: 700,
-                    color: '#dfc285',
+                    color: '#ffffff',
                   }}
                 >
                   {skill.level}%
@@ -139,10 +140,10 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
               <div
                 style={{
                   fontSize: '10px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.12em',
-                  color: '#71717a',
+                  color: '#94a3b8',
                   marginBottom: '12px',
                 }}
               >
@@ -153,18 +154,18 @@ export default function SkillsSection({ skills }: { skills: SkillItem[] }) {
               <div
                 style={{
                   width: '100%',
-                  height: '5px',
-                  background: '#111113',
+                  height: '6px',
+                  background: '#0a0a0d',
                   borderRadius: '10px',
                   overflow: 'hidden',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
                 }}
               >
                 <div
                   style={{
                     height: '100%',
                     width: `${skill.level}%`,
-                    background: 'linear-gradient(90deg, #dfc285, #f5e6be)',
+                    background: 'linear-gradient(90deg, #ffffff, #a1a1aa)',
                     borderRadius: '10px',
                     transition: 'width 1s ease-out',
                   }}

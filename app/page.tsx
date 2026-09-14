@@ -6,6 +6,7 @@ import AboutSection from '@/src/components/AboutSection';
 import ExperienceSection from '@/src/components/ExperienceSection';
 import SkillsSection from '@/src/components/SkillsSection';
 import ProjectsSection from '@/src/components/ProjectsSection';
+import HandwrittenText from '@/src/components/HandwrittenText';
 
 const TOTAL_FRAMES = 240;
 
@@ -76,16 +77,20 @@ export default function Home() {
     };
   }, [showQuote]);
 
-  // Smooth staggered text animation step sequence for quote screen
+  // Smooth staggered text animation step sequence for quote screen with automatic fade-out
   useEffect(() => {
-    const timer1 = setTimeout(() => setQuoteStep(1), 300);
-    const timer2 = setTimeout(() => setQuoteStep(2), 1000);
-    const timer3 = setTimeout(() => setQuoteStep(3), 2000);
+    const timer1 = setTimeout(() => setQuoteStep(1), 200);
+    const timer2 = setTimeout(() => setQuoteStep(2), 800);
+    const timer3 = setTimeout(() => setQuoteStep(3), 1600);
+    const timerAutoExit = setTimeout(() => {
+      handleStartExperience();
+    }, 3200);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timerAutoExit);
     };
   }, []);
 
@@ -336,56 +341,60 @@ export default function Home() {
             transition: 'opacity 1.0s cubic-bezier(0.16, 1, 0.3, 1), transform 1.0s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
-          <div style={{ maxWidth: '850px', width: '100%' }}>
-            {/* Subtitle Tagline */}
+          <div style={{ maxWidth: '820px', width: '100%' }}>
+            {/* Subtitle Badge */}
             <div
               style={{
+                fontFamily: 'var(--font-cinzel), serif',
                 fontSize: '13px',
-                fontWeight: 600,
                 letterSpacing: '0.35em',
                 textTransform: 'uppercase',
-                marginBottom: '32px',
-                color: '#555555',
+                color: '#000000',
+                fontWeight: 700,
+                marginBottom: '24px',
                 opacity: quoteStep >= 1 ? 1 : 0,
                 transform: quoteStep >= 1 ? 'translateY(0)' : 'translateY(16px)',
                 transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
-              A Reflection On Persistence
+              WELCOME TO MY PORTFOLIO
             </div>
 
-            {/* Main Philosophical Quote on Failure & Hard Work */}
+            {/* Structured Quote Block */}
             <blockquote
               style={{
-                fontSize: 'clamp(24px, 4vw, 42px)',
-                fontWeight: 400,
-                fontFamily: "var(--font-cormorant), Georgia, 'Times New Roman', serif",
-                lineHeight: 1.4,
-                letterSpacing: '-0.01em',
+                fontSize: 'clamp(24px, 3.8vw, 42px)',
+                fontWeight: 600,
+                fontFamily: 'var(--font-cormorant), Georgia, serif',
+                fontStyle: 'normal',
+                lineHeight: 1.35,
                 color: '#000000',
                 margin: '0 0 32px 0',
+                padding: '0 16px',
+                display: 'block',
                 opacity: quoteStep >= 2 ? 1 : 0,
                 transform: quoteStep >= 2 ? 'translateY(0)' : 'translateY(20px)',
                 transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
-              {portfolioData?.about?.quote || "“Do not judge me by my successes, judge me by how many times I fell down and got back up again.”"}
+              “Architecting high-performance Android, iOS &amp; full-stack web platforms with engineering precision.”
             </blockquote>
 
-            {/* Quote Author */}
+            {/* Author Attribution */}
             <div
               style={{
-                fontSize: '15px',
-                fontWeight: 500,
-                letterSpacing: '0.15em',
+                fontFamily: 'var(--font-cinzel), serif',
+                fontSize: '14px',
+                letterSpacing: '0.25em',
                 textTransform: 'uppercase',
-                color: '#666666',
+                color: '#000000',
+                fontWeight: 700,
                 marginBottom: '48px',
                 opacity: quoteStep >= 2 ? 1 : 0,
                 transition: 'all 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.15s',
               }}
             >
-              — {portfolioData?.about?.quoteAuthor || "Nelson Mandela"}
+              — RYTHM JAGGA
             </div>
 
             {/* Interactive Start Button */}
@@ -401,17 +410,17 @@ export default function Home() {
                 padding: '16px 38px',
                 borderRadius: '40px',
                 fontSize: '14px',
-                fontWeight: 600,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                 opacity: quoteStep >= 3 ? 1 : 0,
                 transform: quoteStep >= 3 ? 'scale(1)' : 'scale(0.95)',
                 transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
-              Begin Experience
+              Explore Portfolio
             </button>
           </div>
         </div>
@@ -435,7 +444,7 @@ export default function Home() {
         }}
       />
 
-      {/* Left-Aligned Hero Section Banner (Keeps Right Side Open for Background Person) */}
+      {/* Left-Aligned Hero Section Banner (Strictly Constrained to 460px on Left to Prevent Overlapping Background Character) */}
       {!showQuote && (
         <section
           style={{
@@ -449,68 +458,81 @@ export default function Home() {
         >
           <div
             style={{
-              maxWidth: '560px',
+              maxWidth: '460px',
               width: '100%',
-              marginLeft: 'clamp(24px, 6vw, 100px)',
+              marginLeft: 'clamp(16px, 4vw, 60px)',
               textAlign: 'left',
             }}
           >
+            {/* Subtitle Category Line */}
             <span
               style={{
-                fontFamily: 'var(--font-cinzel), serif',
+                fontFamily: 'var(--font-inter), sans-serif',
                 fontSize: '12px',
-                fontWeight: 600,
+                fontWeight: 700,
+                letterSpacing: '0.25em',
                 textTransform: 'uppercase',
-                letterSpacing: '0.35em',
-                color: '#dfc285',
-                marginBottom: '20px',
+                color: '#000000',
+                marginBottom: '14px',
                 display: 'block',
               }}
             >
-              {portfolioData?.about?.title || 'Creative Technologist'}
+              {portfolioData?.about?.title || 'FULL STACK & MOBILE SOFTWARE ENGINEER'}
             </span>
+
+            {/* Main Name Headline */}
             <h1
               style={{
-                fontFamily: 'var(--font-cormorant), Georgia, serif',
-                fontSize: 'clamp(44px, 6vw, 76px)',
-                fontWeight: 400,
-                lineHeight: 1.1,
-                color: '#ffffff',
-                marginBottom: '24px',
+                fontFamily: 'var(--font-outfit), var(--font-inter), sans-serif',
+                fontSize: 'clamp(44px, 5.5vw, 68px)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.05,
+                color: '#000000',
+                marginBottom: '20px',
               }}
             >
               {portfolioData?.about?.name || 'Rythm Jagga'}
             </h1>
+
+            {/* Main Bio Paragraph */}
             <p
               style={{
-                fontFamily: 'var(--font-cormorant), Georgia, serif',
-                fontSize: 'clamp(20px, 2.5vw, 28px)',
-                color: '#e4e4e7',
-                fontStyle: 'italic',
-                lineHeight: 1.4,
-                marginBottom: '40px',
+                marginBottom: '32px',
+                color: '#18181b',
+                fontSize: 'clamp(16px, 1.8vw, 19px)',
+                lineHeight: 1.6,
+                fontFamily: 'var(--font-inter), sans-serif',
+                fontWeight: 450,
               }}
             >
-              {portfolioData?.about?.tagline || 'Architecting high-performance digital experiences through engineering precision.'}
+              {portfolioData?.about?.tagline || 'Full Stack Software Engineer experienced in engineering production mobile apps (Android with Kotlin, iOS with Swift/UIKit) and full-stack web systems (MERN Stack, Next.js, Spring Boot).'}
             </p>
+
+            {/* Clean CTA Button */}
             <div>
               <a
                 href="#about"
                 style={{
-                  display: 'inline-block',
-                  padding: '14px 32px',
-                  borderRadius: '40px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 34px',
+                  borderRadius: '30px',
                   fontSize: '12px',
-                  fontWeight: 600,
+                  fontFamily: 'var(--font-inter), sans-serif',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.15em',
-                  background: 'linear-gradient(135deg, #dfc285 0%, #b89753 100%)',
-                  color: '#050505',
+                  letterSpacing: '0.12em',
+                  background: '#000000',
+                  color: '#ffffff',
                   textDecoration: 'none',
-                  boxShadow: '0 10px 30px rgba(223, 194, 133, 0.25)',
+                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
+                  transition: 'transform 0.2s ease',
                 }}
               >
-                Explore Portfolio ↓
+                <span>Explore Portfolio</span>
+                <span>↓</span>
               </a>
             </div>
           </div>
