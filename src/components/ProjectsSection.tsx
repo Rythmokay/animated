@@ -14,56 +14,147 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
   if (!projects || projects.length === 0) return null;
 
   return (
-    <section id="projects" className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">
-      <div className="max-w-4xl mx-auto w-full">
+    <section
+      id="projects"
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '120px 24px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '560px',
+          width: '100%',
+          marginLeft: 'clamp(24px, 6vw, 100px)',
+          textAlign: 'left',
+        }}
+      >
         {/* Section Header */}
-        <div className="text-center mb-14">
-          <span className="font-cinzel text-xs font-semibold uppercase tracking-[0.35em] text-amber-300/80 mb-3 block">
+        <div style={{ marginBottom: '40px' }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-cinzel), serif',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.35em',
+              color: '#dfc285',
+              marginBottom: '12px',
+              display: 'block',
+            }}
+          >
             Selected Works
           </span>
-          <h2 className="font-calligraphy text-4xl sm:text-5xl font-normal text-neutral-100 mb-6">
-            Featured <span className="italic text-amber-200">Projects</span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-cormorant), Georgia, serif',
+              fontSize: 'clamp(36px, 5vw, 52px)',
+              fontWeight: 400,
+              color: '#ffffff',
+              marginBottom: '20px',
+            }}
+          >
+            Featured <span style={{ fontStyle: 'italic', color: '#dfc285' }}>Projects</span>
           </h2>
-          <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto"></div>
+          <div
+            style={{
+              width: '64px',
+              height: '1px',
+              background: 'linear-gradient(90deg, #dfc285, transparent)',
+            }}
+          />
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
           {projects.map((proj, idx) => (
             <div
               key={proj.id || idx}
-              className={`glass-card p-7 rounded-3xl border border-neutral-800/80 flex flex-col justify-between group ${
-                proj.featured ? 'sm:col-span-2 border-amber-500/20' : ''
-              }`}
+              className="glass-card"
+              style={{
+                padding: '28px',
+                borderRadius: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <span className="font-cinzel text-xs font-semibold uppercase tracking-widest text-amber-300">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-cinzel), serif',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.15em',
+                      color: '#dfc285',
+                    }}
+                  >
                     {proj.category}
                   </span>
                   {proj.featured && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-400/10 border border-amber-400/30 text-amber-200">
+                    <span
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.15em',
+                        background: 'rgba(223, 194, 133, 0.15)',
+                        border: '1px solid rgba(223, 194, 133, 0.4)',
+                        color: '#dfc285',
+                      }}
+                    >
                       ★ Featured
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-calligraphy text-2xl sm:text-3xl font-normal text-neutral-100 mb-3 group-hover:text-amber-200 transition-colors">
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-cormorant), Georgia, serif',
+                    fontSize: '26px',
+                    fontWeight: 400,
+                    color: '#ffffff',
+                    marginBottom: '12px',
+                  }}
+                >
                   {proj.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-5 font-normal">
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: '#a1a1aa',
+                    lineHeight: 1.6,
+                    marginBottom: '20px',
+                  }}
+                >
                   {proj.description}
                 </p>
               </div>
 
               <div>
                 {/* Tech Stack Tags */}
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
                   {proj.tags.map((tag, tIdx) => (
                     <span
                       key={tIdx}
-                      className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900/90 border border-neutral-800 text-neutral-400"
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        fontSize: '10px',
+                        fontWeight: 500,
+                        background: '#111113',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        color: '#a1a1aa',
+                      }}
                     >
                       {tag}
                     </span>
@@ -76,10 +167,20 @@ export default function ProjectsSection({ projects }: { projects: ProjectItem[] 
                     href={proj.link}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-300 hover:text-amber-100 transition-colors"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.15em',
+                      color: '#dfc285',
+                      textDecoration: 'none',
+                    }}
                   >
                     <span>View Project</span>
-                    <span className="text-sm">↗</span>
+                    <span>↗</span>
                   </a>
                 )}
               </div>

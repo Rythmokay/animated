@@ -12,42 +12,135 @@ export default function ExperienceSection({ experiences }: { experiences: Experi
   if (!experiences || experiences.length === 0) return null;
 
   return (
-    <section id="experience" className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">
-      <div className="max-w-4xl mx-auto w-full">
+    <section
+      id="experience"
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '120px 24px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '560px',
+          width: '100%',
+          marginLeft: 'clamp(24px, 6vw, 100px)',
+          textAlign: 'left',
+        }}
+      >
         {/* Section Header */}
-        <div className="text-center mb-14">
-          <span className="font-cinzel text-xs font-semibold uppercase tracking-[0.35em] text-amber-300/80 mb-3 block">
+        <div style={{ marginBottom: '40px' }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-cinzel), serif',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.35em',
+              color: '#dfc285',
+              marginBottom: '12px',
+              display: 'block',
+            }}
+          >
             Career Timeline
           </span>
-          <h2 className="font-calligraphy text-4xl sm:text-5xl font-normal text-neutral-100 mb-6">
-            Professional <span className="italic text-amber-200">Experience</span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-cormorant), Georgia, serif',
+              fontSize: 'clamp(36px, 5vw, 52px)',
+              fontWeight: 400,
+              color: '#ffffff',
+              marginBottom: '20px',
+            }}
+          >
+            Professional <span style={{ fontStyle: 'italic', color: '#dfc285' }}>Experience</span>
           </h2>
-          <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto"></div>
+          <div
+            style={{
+              width: '64px',
+              height: '1px',
+              background: 'linear-gradient(90deg, #dfc285, transparent)',
+            }}
+          />
         </div>
 
         {/* Timeline Container */}
-        <div className="relative border-l border-neutral-800/80 ml-4 sm:ml-8 space-y-10">
+        <div style={{ position: 'relative', borderLeft: '1px solid rgba(255, 255, 255, 0.12)', marginLeft: '12px', paddingLeft: '28px' }}>
           {experiences.map((exp, idx) => (
-            <div key={exp.id || idx} className="relative pl-8 sm:pl-10 group">
-              {/* Gold Timeline Dot */}
-              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-neutral-950 border-2 border-amber-400 group-hover:bg-amber-400 group-hover:scale-125 transition-all"></div>
+            <div key={exp.id || idx} style={{ position: 'relative', marginBottom: '32px' }}>
+              {/* Gold Marker Dot */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '-37px',
+                  top: '10px',
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  background: '#050505',
+                  border: '2px solid #dfc285',
+                  boxShadow: '0 0 12px rgba(223, 194, 133, 0.4)',
+                }}
+              />
 
               {/* Glass Card */}
-              <div className="glass-card p-6 sm:p-8 rounded-2xl border border-neutral-800/80">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div
+                className="glass-card"
+                style={{
+                  padding: '28px',
+                  borderRadius: '20px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                   <div>
-                    <h3 className="font-calligraphy text-2xl font-normal text-neutral-100 mb-1">
+                    <h3
+                      style={{
+                        fontFamily: 'var(--font-cormorant), Georgia, serif',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        color: '#ffffff',
+                        marginBottom: '4px',
+                      }}
+                    >
                       {exp.role}
                     </h3>
-                    <div className="font-cinzel text-xs font-semibold uppercase tracking-wider text-amber-300">
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-cinzel), serif',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.15em',
+                        color: '#dfc285',
+                      }}
+                    >
                       {exp.company}
                     </div>
                   </div>
-                  <span className="inline-block px-3.5 py-1 rounded-full text-[11px] font-medium bg-neutral-900 border border-neutral-800 text-neutral-400 self-start sm:self-auto">
+                  <span
+                    style={{
+                      padding: '4px 12px',
+                      borderRadius: '20px',
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      background: '#111113',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: '#a1a1aa',
+                    }}
+                  >
                     {exp.period}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed font-normal">
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: '#a1a1aa',
+                    lineHeight: 1.6,
+                  }}
+                >
                   {exp.description}
                 </p>
               </div>

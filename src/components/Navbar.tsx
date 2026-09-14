@@ -9,30 +9,88 @@ interface NavbarProps {
 
 export default function Navbar({ isMuted, toggleAudio }: NavbarProps) {
   return (
-    <header className="fixed top-0 left-0 w-full z-50 px-6 py-5 transition-all duration-300">
-      <div className="max-w-6xl mx-auto flex items-center justify-between glass-pill px-6 py-3.5 rounded-full">
+    <header
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 50,
+        padding: '20px 24px',
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
+      <div
+        className="glass-pill"
+        style={{
+          maxWidth: '1100px',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 28px',
+          borderRadius: '50px',
+          pointerEvents: 'auto',
+        }}
+      >
         {/* Brand Logo / Monogram */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-full bg-neutral-900 border border-amber-500/30 flex items-center justify-center font-calligraphy text-base font-bold text-amber-200 group-hover:border-amber-400 transition-colors">
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: '#111113',
+              border: '1px solid rgba(223, 194, 133, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-cormorant), Georgia, serif',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: '#dfc285',
+            }}
+          >
             R
           </div>
-          <span className="font-cinzel text-xs font-semibold tracking-[0.2em] text-neutral-200 group-hover:text-amber-200 transition-colors">
+          <span
+            style={{
+              fontFamily: 'var(--font-cinzel), serif',
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '0.2em',
+              color: '#f4f4f5',
+            }}
+          >
             RYTHM JAGGA
           </span>
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-[11px] font-medium uppercase tracking-[0.25em] text-neutral-400">
-          <a href="#about" className="hover:text-amber-200 transition-colors">
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '32px',
+            fontSize: '11px',
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: '0.25em',
+            color: '#a1a1aa',
+          }}
+        >
+          <a href="#about" style={{ color: 'inherit', textDecoration: 'none' }}>
             About
           </a>
-          <a href="#experience" className="hover:text-amber-200 transition-colors">
+          <a href="#experience" style={{ color: 'inherit', textDecoration: 'none' }}>
             Experience
           </a>
-          <a href="#skills" className="hover:text-amber-200 transition-colors">
+          <a href="#skills" style={{ color: 'inherit', textDecoration: 'none' }}>
             Skillset
           </a>
-          <a href="#projects" className="hover:text-amber-200 transition-colors">
+          <a href="#projects" style={{ color: 'inherit', textDecoration: 'none' }}>
             Projects
           </a>
         </nav>
@@ -40,7 +98,21 @@ export default function Navbar({ isMuted, toggleAudio }: NavbarProps) {
         {/* Audio Toggle Control */}
         <button
           onClick={toggleAudio}
-          className="px-4 py-2 rounded-full text-xs font-medium tracking-wider bg-neutral-900/90 border border-neutral-800 hover:border-amber-500/40 text-neutral-300 hover:text-amber-200 transition-all flex items-center gap-2"
+          style={{
+            padding: '8px 18px',
+            borderRadius: '30px',
+            fontSize: '12px',
+            fontWeight: 500,
+            letterSpacing: '0.05em',
+            background: 'rgba(15, 15, 18, 0.9)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: isMuted ? '#71717a' : '#f4f4f5',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.2s ease',
+          }}
           aria-label="Toggle Sound"
         >
           <span>{isMuted ? '🔇' : '🎧'}</span>

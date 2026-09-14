@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,7 +11,6 @@
   --font-cinzel: 'Cinzel', serif;
   --font-inter: 'Inter', -apple-system, sans-serif;
   --color-gold: #dfc285;
-  --color-gold-glow: rgba(223, 194, 133, 0.35);
   --color-bg-dark: #050505;
 }
 
@@ -56,25 +57,26 @@ body {
 
 /* Glassmorphism Luxury Card Styles */
 .glass-card {
-  background: rgba(18, 18, 20, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(12, 12, 15, 0.75) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .glass-card:hover {
-  border-color: rgba(223, 194, 133, 0.3);
-  box-shadow: 0 15px 40px rgba(223, 194, 133, 0.12);
-  transform: translateY(-2px);
+  border-color: rgba(223, 194, 133, 0.4) !important;
+  box-shadow: 0 25px 60px rgba(223, 194, 133, 0.15) !important;
+  transform: translateY(-3px) !important;
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 18, 0.8) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Force override any scroll-lock class injected by extensions or IDE wrappers */

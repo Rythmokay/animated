@@ -45,7 +45,7 @@ export default function Home() {
       .catch(err => console.error('Error fetching portfolio data:', err));
   }, []);
 
-  // Initialize HTML5 Audio with gentle volume (15% volume)
+  // Initialize HTML5 Audio with reduced volume (15% volume)
   useEffect(() => {
     const audio = new Audio('/sound.mp3');
     audio.loop = true;
@@ -208,7 +208,7 @@ export default function Home() {
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
   };
 
-  // Scroll listener: Computes target frame AND controls audio so it ONLY plays while actively scrolling (volume = 0.15)
+  // Scroll listener: Computes target frame AND controls audio so it ONLY plays while actively scrolling
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
@@ -226,7 +226,7 @@ export default function Home() {
 
       // Play reduced volume audio ONLY while actively scrolling
       if (!showQuote && !isMuted && audioRef.current) {
-        audioRef.current.volume = 0.15; // 15% volume
+        audioRef.current.volume = 0.15;
         if (audioRef.current.paused) {
           audioRef.current.play().catch(() => {});
         }
@@ -417,7 +417,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Full screen canvas fixed to viewport background */}
+      {/* Crystal Clear Full Screen Canvas Fixed to Background */}
       <canvas
         ref={canvasRef}
         style={{
@@ -430,28 +430,85 @@ export default function Home() {
           objectFit: 'cover',
           pointerEvents: 'none',
           zIndex: 1,
-          opacity: showQuote ? 0 : 0.85,
+          opacity: showQuote ? 0 : 1, // 100% Full Opacity to make the background person crystal clear
           transition: 'opacity 1.5s ease',
         }}
       />
 
-      {/* Hero Section Banner */}
+      {/* Left-Aligned Hero Section Banner (Keeps Right Side Open for Background Person) */}
       {!showQuote && (
-        <section className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12 text-center">
-          <div className="max-w-4xl mx-auto">
-            <span className="font-cinzel text-xs font-semibold uppercase tracking-[0.4em] text-amber-300 mb-6 block">
+        <section
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '120px 24px',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '560px',
+              width: '100%',
+              marginLeft: 'clamp(24px, 6vw, 100px)',
+              textAlign: 'left',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--font-cinzel), serif',
+                fontSize: '12px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.35em',
+                color: '#dfc285',
+                marginBottom: '20px',
+                display: 'block',
+              }}
+            >
               {portfolioData?.about?.title || 'Creative Technologist'}
             </span>
-            <h1 className="font-calligraphy text-5xl sm:text-7xl md:text-8xl font-normal tracking-tight text-white mb-8">
+            <h1
+              style={{
+                fontFamily: 'var(--font-cormorant), Georgia, serif',
+                fontSize: 'clamp(44px, 6vw, 76px)',
+                fontWeight: 400,
+                lineHeight: 1.1,
+                color: '#ffffff',
+                marginBottom: '24px',
+              }}
+            >
               {portfolioData?.about?.name || 'Rythm Jagga'}
             </h1>
-            <p className="font-calligraphy text-2xl sm:text-3xl text-neutral-300 italic max-w-2xl mx-auto mb-12">
+            <p
+              style={{
+                fontFamily: 'var(--font-cormorant), Georgia, serif',
+                fontSize: 'clamp(20px, 2.5vw, 28px)',
+                color: '#e4e4e7',
+                fontStyle: 'italic',
+                lineHeight: 1.4,
+                marginBottom: '40px',
+              }}
+            >
               {portfolioData?.about?.tagline || 'Architecting high-performance digital experiences through engineering precision.'}
             </p>
-            <div className="flex justify-center gap-4">
+            <div>
               <a
                 href="#about"
-                className="px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-neutral-950 hover:from-amber-100 hover:to-amber-300 transition-all shadow-xl shadow-amber-500/20"
+                style={{
+                  display: 'inline-block',
+                  padding: '14px 32px',
+                  borderRadius: '40px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  background: 'linear-gradient(135deg, #dfc285 0%, #b89753 100%)',
+                  color: '#050505',
+                  textDecoration: 'none',
+                  boxShadow: '0 10px 30px rgba(223, 194, 133, 0.25)',
+                }}
               >
                 Explore Portfolio ↓
               </a>
@@ -460,7 +517,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* Layered Portfolio Sections */}
+      {/* Layered Left-Aligned Portfolio Sections */}
       {!showQuote && portfolioData && (
         <>
           <AboutSection data={portfolioData.about} />
@@ -469,12 +526,33 @@ export default function Home() {
           <ProjectsSection projects={portfolioData.projects} />
 
           {/* Footer */}
-          <footer className="relative z-10 py-16 px-6 border-t border-neutral-800/80 text-center">
-            <div className="max-w-5xl mx-auto">
-              <div className="font-calligraphy text-3xl font-normal text-neutral-200 mb-4">
+          <footer
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              padding: '64px 24px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <div
+              style={{
+                maxWidth: '560px',
+                marginLeft: 'clamp(24px, 6vw, 100px)',
+                textAlign: 'left',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'var(--font-cormorant), Georgia, serif',
+                  fontSize: '28px',
+                  fontWeight: 400,
+                  color: '#ffffff',
+                  marginBottom: '12px',
+                }}
+              >
                 Rythm Jagga
               </div>
-              <p className="text-xs text-neutral-500 uppercase tracking-widest mb-6">
+              <p style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
                 © {new Date().getFullYear()} — Built with Next.js 15, Canvas 2D & Luxury Aesthetics
               </p>
             </div>

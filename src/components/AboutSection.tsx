@@ -14,36 +14,126 @@ export default function AboutSection({ data }: { data: AboutData }) {
   if (!data) return null;
 
   return (
-    <section id="about" className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">
-      <div className="max-w-4xl mx-auto w-full">
+    <section
+      id="about"
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '120px 24px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '560px',
+          width: '100%',
+          marginLeft: 'clamp(24px, 6vw, 100px)',
+          textAlign: 'left',
+        }}
+      >
         {/* Section Header */}
-        <div className="text-center mb-14">
-          <span className="font-cinzel text-xs font-semibold uppercase tracking-[0.35em] text-amber-300/80 mb-3 block">
+        <div style={{ marginBottom: '40px' }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-cinzel), serif',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.35em',
+              color: '#dfc285',
+              marginBottom: '12px',
+              display: 'block',
+            }}
+          >
             About & Philosophy
           </span>
-          <h2 className="font-calligraphy text-4xl sm:text-5xl font-normal text-neutral-100 mb-6">
-            Architecting <span className="italic text-amber-200">Excellence</span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-cormorant), Georgia, serif',
+              fontSize: 'clamp(36px, 5vw, 52px)',
+              fontWeight: 400,
+              color: '#ffffff',
+              marginBottom: '20px',
+            }}
+          >
+            Architecting <span style={{ fontStyle: 'italic', color: '#dfc285' }}>Excellence</span>
           </h2>
-          <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto"></div>
+          <div
+            style={{
+              width: '64px',
+              height: '1px',
+              background: 'linear-gradient(90deg, #dfc285, transparent)',
+            }}
+          />
         </div>
 
         {/* Glass Card */}
-        <div className="glass-card p-8 sm:p-12 rounded-3xl mb-10 border border-neutral-800/80">
-          <p className="font-calligraphy text-2xl sm:text-3xl text-neutral-200 leading-relaxed mb-6 italic text-center">
+        <div
+          className="glass-card"
+          style={{
+            padding: '36px 32px',
+            borderRadius: '24px',
+            marginBottom: '32px',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--font-cormorant), Georgia, serif',
+              fontSize: 'clamp(20px, 2.5vw, 26px)',
+              color: '#f4f4f5',
+              lineHeight: 1.5,
+              marginBottom: '20px',
+              fontStyle: 'italic',
+            }}
+          >
             "{data.tagline}"
           </p>
-          <p className="text-sm sm:text-base text-neutral-400 leading-relaxed font-normal text-center max-w-2xl mx-auto mb-10">
+          <p
+            style={{
+              fontSize: '14px',
+              color: '#a1a1aa',
+              lineHeight: 1.7,
+              fontWeight: 400,
+              marginBottom: '32px',
+            }}
+          >
             {data.bio}
           </p>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-neutral-800/80">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '20px',
+              paddingTop: '28px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
             {data.stats.map((stat, idx) => (
-              <div key={idx} className="text-center">
-                <div className="font-cinzel text-2xl sm:text-3xl font-bold text-amber-200 mb-1">
+              <div key={idx} style={{ textAlign: 'left' }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-cinzel), serif',
+                    fontSize: '26px',
+                    fontWeight: 700,
+                    color: '#dfc285',
+                    marginBottom: '4px',
+                  }}
+                >
                   {stat.value}
                 </div>
-                <div className="text-[11px] font-medium uppercase tracking-widest text-neutral-500">
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.15em',
+                    color: '#71717a',
+                  }}
+                >
                   {stat.label}
                 </div>
               </div>
